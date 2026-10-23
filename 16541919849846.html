@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Time Under Water — Bitcoin and the 50-week line</title>
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;background:#000;overflow:hidden}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#fff}
+  #cv{display:block;width:100vw;height:100vh}
+  /* ---------- Bedienfeld ---------- */
+  #pan{position:fixed;top:14px;left:14px;z-index:30;width:318px;background:rgba(10,10,12,.86);
+       border:1px solid rgba(255,255,255,.14);border-radius:12px;backdrop-filter:blur(7px);
+       font-size:12.5px;user-select:none;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+  #panH{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;cursor:move;
+        border-bottom:1px solid rgba(255,255,255,.10)}
+  #panH b{font-size:12px;letter-spacing:.10em;font-weight:700;color:#fff}
+  #panT{background:none;border:0;color:#fff;font-size:14px;cursor:pointer;opacity:.8;padding:0 3px}
+  #panB{padding:11px;max-height:calc(100vh - 190px);overflow-y:auto;overscroll-behavior:contain}
+  #pan.zu #panB{display:none}
+  .stufen{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+  .stufe{text-align:left;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.13);
+         background:rgba(255,255,255,.03);color:#c9ced6;cursor:pointer;font-size:12.5px;font-weight:600;
+         letter-spacing:.02em;transition:.15s}
+  .stufe:hover{background:rgba(255,255,255,.08)}
+  .stufe.on{background:rgba(247,147,26,.17);border-color:#F7931A;color:#F7931A}
+  .rg{margin:11px 0 4px}
+  .rg label{display:flex;justify-content:space-between;font-size:11.5px;color:#aab1ba;letter-spacing:.03em;margin-bottom:5px}
+  .rg label span{color:#fff;font-weight:700}
+  .rg input[type=range]{width:100%;-webkit-appearance:none;height:4px;border-radius:3px;
+        background:rgba(255,255,255,.16);outline:none}
+  .rg input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+        background:#F7931A;cursor:pointer;box-shadow:0 0 0 3px rgba(247,147,26,.22)}
+  .rg input[type=range]::-moz-range-thumb{width:15px;height:15px;border:0;border-radius:50%;background:#F7931A;cursor:pointer}
+  .rgh{font-size:10.8px;color:#7f8792;line-height:1.35;margin-top:4px}
+  .swrow{display:flex;gap:16px;flex-wrap:wrap}
+  .sw{display:flex;align-items:center;gap:7px;margin:12px 0 4px;font-size:11.8px;color:#aab1ba;cursor:pointer}
+  .sw i{width:32px;height:17px;border-radius:9px;background:rgba(255,255,255,.16);position:relative;transition:.15s;flex:0 0 auto}
+  .sw i:after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:.15s}
+  .sw.on i{background:rgba(247,147,26,.55)}
+  .sw.on i:after{left:17px;background:#F7931A}
+  .kach{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px}
+  .k{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:7px 8px}
+  .k u{display:block;text-decoration:none;font-size:9.6px;letter-spacing:.07em;color:#8b929c;margin-bottom:3px}
+  .k b{font-size:15.5px;font-weight:800;letter-spacing:-.01em}
+  .qz{margin-top:11px;font-size:10px;line-height:1.45;color:#6f767f;border-top:1px solid rgba(255,255,255,.08);padding-top:8px}
+  /* ---------- Teilen-Leiste ---------- */
+  #srl{position:fixed;right:16px;bottom:14px;z-index:40;display:flex;gap:7px;align-items:center}
+  #srl a{display:flex;align-items:center;gap:0;height:34px;padding:0 9px;border-radius:9px;
+         background:rgba(14,14,16,.82);border:1px solid rgba(255,255,255,.14);color:#fff;text-decoration:none;
+         transition:color .15s,border-color .15s;backdrop-filter:blur(6px)}
+  #srl a svg{width:17px;height:17px;flex:0 0 auto}
+  #srl a span{max-width:0;overflow:hidden;white-space:nowrap;font-size:11.5px;font-weight:600;letter-spacing:.02em;
+              transition:max-width .22s ease,margin-left .22s ease;margin-left:0}
+  #srl a:hover span{max-width:120px;margin-left:7px}
+  #srl a.wa:hover{color:#25D366;border-color:rgba(37,211,102,.55)}
+  #srl a.xx:hover{color:#FFFFFF;border-color:rgba(255,255,255,.55)}
+  #srl a.yt:hover{color:#FF0000;border-color:rgba(255,0,0,.55)}
+  #srl a.lk:hover{color:#F7931A;border-color:rgba(247,147,26,.55)}
+  /* ---------- Tooltip ---------- */
+  #tt{position:fixed;z-index:50;pointer-events:none;display:none;background:rgba(8,8,10,.93);
+      border:1px solid rgba(255,255,255,.16);border-radius:9px;padding:9px 11px;font-size:12px;line-height:1.55;
+      box-shadow:0 8px 26px rgba(0,0,0,.7)}
+  #tt .d{color:#98a0aa;font-size:10.6px;letter-spacing:.05em;margin-bottom:3px}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div id="pan" class="zu">
+  <div id="panH"><b>TIME UNDER WATER</b><button id="panT" title="expand / collapse">&#9654;</button></div>
+  <div id="panB">
+
+    <div class="stufen">
+      <button class="stufe on" data-s="1">1 &middot; Did the low hold?</button>
+      <button class="stufe" data-s="2">2 &middot; Did it sink again?</button>
+      <button class="stufe" data-s="3">3 &middot; Tonight</button>
+    </div>
+
+    <div class="rg">
+      <label>MIN DIVE <span id="lG">&mdash;</span></label>
+      <input type="range" id="rG" min="1" max="52" value="13">
+      <div class="rgh">Only count a surfacing after at least this many weeks under the line. Drag to 1: every crossing counts.</div>
+    </div>
+    <div class="rg">
+      <label>TIME RANGE <span id="lZ">&mdash;</span></label>
+      <input type="range" id="rZ" min="0" max="1000" value="0">
+      <div class="rgh">Left edge of the chart. The price axis follows the visible window.</div>
+    </div>
+    <div class="swrow">
+      <div class="sw on" id="swM"><i></i><span>Markers</span></div>
+      <div class="sw on" id="swT"><i></i><span>Text</span></div>
+    </div>
+    <div class="rgh">Both off: a clean canvas for drawing.</div>
+    <div class="kach">
+      <div class="k"><u>WEEKS UNDER WATER</u><b id="k1">&mdash;</b></div>
+      <div class="k"><u>LOW OF THIS DIVE</u><b id="k2">&mdash;</b></div>
+      <div class="k"><u>SUNDAY CLOSE TO SURFACE</u><b id="k3">&mdash;</b></div>
+      <div class="k"><u>ABOVE THE LOW NOW</u><b id="k4">&mdash;</b></div>
+    </div>
+    <div class="qz" id="qz"></div>
+  </div>
+</div>
+
+<div id="srl">
+  <a class="wa" href="#" title="Share on WhatsApp" aria-label="Share on WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884a9.82 9.82 0 0 1 6.988 2.898 9.83 9.83 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.82 11.82 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.9 11.9 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 0 0-3.48-8.413"/></svg><span>WhatsApp</span></a>
+  <a class="xx" href="#" title="Share on X" aria-label="Share on X"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg><span>X / Twitter</span></a>
+  <a class="yt" href="#" title="Channel on YouTube" aria-label="Channel on YouTube"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.02 3.02 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.02 3.02 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.02 3.02 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.02 3.02 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814M9.546 15.568V8.432L15.818 12z"/></svg><span>YouTube</span></a>
+  <a class="lk" href="#" title="Copy link" aria-label="Copy link"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.59 13.41a1 1 0 0 1 0-1.41l2.83-2.83a3 3 0 0 1 4.24 4.24l-1.41 1.42a1 1 0 0 1-1.42-1.42l1.42-1.41a1 1 0 0 0-1.42-1.42l-2.82 2.83a1 1 0 0 1-1.42 0m2.82-2.82a1 1 0 0 1 0 1.41l-2.83 2.83a3 3 0 0 1-4.24-4.24l1.41-1.42a1 1 0 0 1 1.42 1.42l-1.42 1.41a1 1 0 0 0 1.42 1.42l2.82-2.83a1 1 0 0 1 1.42 0"/><path d="M7.05 16.95a5 5 0 0 1 0-7.07l2.12-2.12a1 1 0 1 1 1.41 1.41l-2.12 2.13a3 3 0 0 0 4.24 4.24l2.12-2.12a1 1 0 1 1 1.42 1.41l-2.13 2.12a5 5 0 0 1-7.06 0"/></svg><span>Copy link</span></a>
+</div>
+
+<div id="tt"></div>
+
+<script>
+"use strict";
+const D={"t0":1279411200,"step":604800,"px":[0.0858,0.0505,0.0611,0.0609,0.0651,0.0659,0.064,0.0617,0.0615,0.0627,0.062,0.0611,0.0971,0.102,0.115,0.1925,0.34,0.279,0.2767,0.2714,0.2029,0.2199,0.2401,0.265,0.3,0.323,0.3868,0.4424,0.4771,0.898,1.05,0.865,0.895,0.8848,0.8925,0.7415,0.822,0.779,0.7332,1.1,1.63,3.09,3.85,6.92,6.71,8.4,16.54,18.85,17.51,16.36,15.46,14.62,13.26,13.99,13.37,8.5,10.81,11.35,9.03,8.2,5.85,5.24,5.34,5.01,4.11,3.61,3.15,3.26,2.96,2.99,2.2,2.48,2.82,3.25,3.19,4.23,5.29,7.1,7.05,6.3,5.39,5.68,5.52,4.39,4.93,4.83,4.89,5.27,4.55,4.79,4.78,4.96,5.2,4.9,5.05,4.94,5.09,5.13,5.21,5.46,6.2,6.35,6.63,6.8,7.63,8.51,8.75,10.81,11.59,7.83,10.55,10.23,11.06,11.89,12.17,12.39,11.87,11.65,11.66,10.71,10.8,10.84,11.67,12.53,12.5,13.35,13.33,13.32,13.45,13.5,14.16,15.72,17.86,20.58,23.9,26.93,29.88,34.45,46.07,47.33,71.69,93.9,162.9,88.86,118.5,134.6,116.5,114.9,117.0,130.2,122.6,99.9,99.04,100.3,89.48,72.11,89.89,85.66,92.75,96.37,94.27,99.18,113.1,130.5,118.1,125.1,123.1,127.1,122.5,132.4,166.5,194.5,210.3,327.6,485.3,807.2,964.5,783.6,864.1,615.0,727.3,902.5,845.2,838.4,814.5,814.5,687.4,623.3,610.1,558.5,640.6,634.2,559.0,459.0,458.6,416.4,501.6,438.7,436.7,439.1,447.0,573.3,630.1,657.8,589.7,599.6,600.8,634.7,629.9,625.2,591.6,586.8,589.4,497.8,508.4,478.5,478.4,475.6,400.4,375.5,322.8,377.9,388.7,353.1,324.2,363.6,390.2,367.8,378.7,376.6,356.1,321.0,317.0,263.3,268.8,211.1,254.5,227.1,224.0,234.4,236.7,260.7,275.3,287.3,268.9,243.0,261.1,237.1,223.3,220.5,240.5,240.7,237.0,240.7,229.5,223.4,232.5,244.3,249.1,271.3,311.5,275.3,293.3,282.4,266.3,258.9,228.7,229.0,240.8,230.5,231.4,233.2,239.5,248.5,263.5,286.0,329.9,372.4,319.9,323.7,371.7,393.3,434.4,442.2,422.7,430.1,448.6,382.5,403.4,366.3,375.2,406.2,438.7,433.1,403.7,411.8,412.1,425.5,420.1,422.0,429.3,463.4,455.0,461.4,460.9,440.6,527.5,575.1,670.4,766.8,630.4,662.6,650.0,681.1,661.4,624.8,594.7,571.4,580.8,575.1,610.5,608.2,611.5,600.6,611.7,617.1,642.9,652.0,699.3,715.9,703.6,730.4,727.7,766.4,770.5,790.6,896.0,997.3,912.5,824.5,922.5,915.6,1014.6,1006.3,1058.8,1181.7,1276.3,1231.7,1020.2,963.0,1105.6,1213.6,1173.7,1250.0,1382.0,1526.3,1794.6,2045.2,2225.7,2525.0,2974.2,2508.2,2497.7,2518.9,2506.2,1910.7,2753.2,2749.4,3230.1,4063.8,4085.8,4344.9,4625.3,4261.8,3711.9,3676.9,4382.1,4600.7,5689.9,5996.6,6174.7,7371.1,5829.1,8018.3,9319.9,11213.9,15475.0,19250.5,14026.3,13921.5,16231.7,13681.1,11422.4,11616.0,8250.5,8096.7,10452.1,9603.2,11462.6,9513.5,8189.0,8440.6,6804.5,7010.0,8342.3,8801.0,9397.0,9595.1,8695.8,8511.4,7338.2,7702.2,6744.7,6450.7,6146.5,6361.4,6704.9,6347.6,7399.5,8229.6,7031.6,6314.7,6490.7,6689.9,7286.7,6249.2,6497.4,6703.1,6604.5,6564.6,6182.9,6415.3,6406.6,6420.4,6335.4,5555.4,3946.9,4098.7,3540.4,3195.4,3942.7,3825.4,4046.0,3508.7,3538.3,3537.6,3413.0,3642.0,3622.8,3754.2,3782.4,3903.9,3967.1,3970.7,4094.3,5189.1,5156.8,5295.7,5148.7,5728.4,6942.6,8219.7,8731.5,8744.4,7634.1,9019.5,10794.4,10842.6,11456.2,10283.1,10589.7,9529.8,10986.5,11530.2,10331.3,10100.4,9762.9,10407.3,10306.2,10047.0,8064.5,7854.6,8291.3,8213.7,9558.2,9209.6,9042.9,8505.2,6943.4,7417.7,7528.9,7111.3,7479.4,7391.6,7345.5,8164.5,8687.4,8573.9,9339.4,10151.1,9952.0,9972.8,8541.8,8109.6,5358.6,5830.6,5904.9,6790.8,6978.7,7150.2,7684.1,8896.8,8715.0,9682.5,8806.2,9433.9,9747.6,9343.0,9284.8,9108.1,9079.6,9289.1,9218.8,9933.9,11094.0,11680.5,11899.6,11665.6,11699.0,10253.3,10322.5,10921.2,10758.8,10665.6,11378.3,11489.6,13041.6,13736.9,15500.0,15986.8,18482.7,18190.9,19356.3,19156.1,23528.6,26430.9,33277.8,38329.3,36069.9,32216.1,33157.8,39003.0,48829.8,57500.7,45359.5,51086.5,59905.6,57447.9,55713.0,58202.2,59932.9,56389.6,48946.9,56572.6,58288.4,46022.5,34774.2,35652.2,35720.6,38925.4,35599.9,34506.5,35355.6,34258.4,31707.7,35119.9,39969.0,43972.3,47074.4,49363.3,48948.3,51747.6,46180.6,47218.5,43131.3,48202.6,54701.3,61462.2,60865.4,61433.0,63043.8,65032.2,59032.6,57248.6,49327.1,50136.6,46876.4,50798.3,47352.6,41886.5,43168.9,36271.1,37983.5,42358.2,42195.6,38551.6,37664.8,38399.3,37808.3,41294.7,46777.2,46440.5,42264.5,39704.8,39511.6,38459.2,34058.9,31182.6,30331.9,29430.1,29915.4,26830.3,20492.3,21066.6,19276.5,20831.3,20827.9,22653.4,23356.2,23153.7,24314.2,21554.0,19673.5,19961.9,21732.8,19427.1,18793.2,19015.3,19428.4,19261.7,19565.4,20616.7,20946.8,16320.5,16246.8,16436.1,17121.7,17094.4,16776.1,16824.8,16606.8,17059.2,20876.0,22716.3,23775.0,22957.2,21772.1,24367.0,23542.1,22419.8,22066.0,28185.2,28049.4,28162.0,28357.8,30312.9,27604.7,29362.1,28761.7,26918.3,26777.1,28097.5,27158.3,25906.8,26354.0,30467.4,30594.2,30163.2,30249.8,30066.6,29262.8,29048.0,29286.1,26176.5,26086.4,25962.5,25831.5,26502.4,26286.6,27950.1,27936.3,27130.3,29984.2,34574.3,35105.0,37053.3,37442.7,37482.7,39978.2,43732.7,41428.7,43097.8,42217.2,43844.2,41888.2,41537.1,41983.0,42576.3,48200.8,52148.1,51746.5,62991.4,68882.3,68285.1,67289.6,71227.5,69392.7,65648.8,64968.2,62978.6,64067.6,61431.3,66259.5,68445.0,67805.5,69644.0,66622.6,63345.0,62763.3,56112.6,61015.0,68056.6,68170.7,58306.3,58836.1,58793.2,64498.0,57349.1,54859.3,59129.9,63572.0,65617.8,62789.9,62759.4,69012.4,68000.1,68742.8,80409.3,89733.0,97980.2,97469.6,100799.0,104551.4,95149.1,93457.6,98414.8,94353.8,100954.6,102833.4,97424.8,96309.8,96182.3,96091.6,94328.0,80647.8,82492.1,85760.9,82216.5,77949.1,83569.0,85101.7,93812.9,94377.8,103976.1,106015.7,108914.9,105750.2,105727.7,105512.8,100899.2,108360.9,109180.0,118899.7,117305.7,119438.2,114263.7,119189.2,117602.0,113516.1,108316.4,111307.8,115395.9,115320.9,112170.0,123523.8,115152.9,108706.7,114557.1,110389.2,104685.5,94182.3,86872.5,90607.7,90067.8,88096.4,88533.4,87747.6,91359.8,90717.2,94261.3,86445.7,76911.1,70522.6,68630.0,67550.0,65733.5,66202.7,72712.1,68018.2,65966.8,68921.8,70685.4,73905.2,78538.8,78649.2,82256.8,77497.7,76951.0,73599.6,63158.3,65615.3,63365.4,59516.7,63619.9,63752.3,64653.0,65328.8,63445.7,64864.9,62818.4,77593.0,77689.2,80320.0,76759.3],"stand":"19.09.2026","standTs":1789776000,"kurs":81262.35,"N":50,"H":26,"bs":{"19.09.2026":81235.14,"13.09.2026":76808.69,"28.06.2026":59473.29}};
+
+/* ===================== Grundlagen ===================== */
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d', {alpha:false});
+const OR = '#F7931A', EC = '#33A1F2', BL = '#5AC8FA', WH = '#FFFFFF', GR = '#98A0AA';
+const DAY = 86400, YR = 365.2425*DAY;
+
+const S = {
+  t0: 0,            // linker Bildrand (Unix s)
+  minDive: 13,      // Mindest-Tauchzeit in Wochen, ab der ein Auftauchen zaehlt
+  stufe: 1,         // 1 Tief gehalten? · 2 Wieder gesunken? · 3 Heute Abend
+  marken: true,
+  texte: true,
+  cinema: null,
+  W: 0, H: 0
+};
+
+const NP = D.px.length;                        // abgeschlossene Wochen (Sonntagsschluss)
+const NA = NP+1;                               // plus der letzte Tageswert (laufende Woche)
+const T_MIN   = D.t0;                          // 18.07.2010
+const T_RIGHT = D.standTs + 20*DAY;            // knapp drei Wochen ueber den Stichtag
+const T_MAXZ  = Date.UTC(2024,0,7)/1000;       // spaetester linker Rand
+S.t0 = T_MIN;
+
+const num = (v,d)=>v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+/* Chart und Animationen sind englisch (19.09.2026): Daten als "17 Jan 2025", Zahlen en-US */
+function dstr(ts){const d=new Date(ts*1000);return d.getUTCDate()+' '+MON[d.getUTCMonth()]+' '+d.getUTCFullYear();}
+function dstr2(ts){return dstr(ts);}
+function dEN(s){ const m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(s||''); return m? (+m[1])+' '+MON[+m[2]-1]+' '+m[3] : s; }
+function yfrac(ts){const d=new Date(ts*1000);const y=d.getUTCFullYear();const a=Date.UTC(y,0,1)/1000,b=Date.UTC(y+1,0,1)/1000;return y+(ts-a)/(b-a);}
+
+/* ---- Zeitraster: NP Sonntage, danach der Stichtag als letzter Punkt ---- */
+const TS = new Float64Array(NA); for(let i=0;i<NP;i++) TS[i]=D.t0+i*D.step; TS[NP]=D.standTs;
+const PX = new Float64Array(NA); for(let i=0;i<NP;i++) PX[i]=D.px[i]; PX[NP]=D.kurs;
+const tsOfI = i => TS[Math.max(0,Math.min(NA-1,i))];
+const iOf   = ts => Math.max(0,Math.min(NA-1,Math.round((ts - D.t0)/D.step)));
+function pxAt(ts){ const f=(ts-D.t0)/D.step; if(f<=0)return PX[0]; if(f>=NP-1)return PX[NP-1];
+  const a=Math.floor(f), b=a+1, r=f-a; return PX[a]*Math.pow(PX[b]/PX[a],r); }
+
+/* ===================== Die Rechnung =====================
+   Die Wasserlinie ist der Durchschnitt der letzten 50 Wochenschluesse. Ein
+   Tauchgang beginnt mit dem ersten Wochenschluss unter der Linie und endet
+   mit dem ersten darueber - dem Auftauchen. Fuer jedes Auftauchen wird aus
+   den Rohdaten gezaehlt: wie lange der Tauchgang war, wo sein Tief lag, ob
+   dieses Tief spaeter noch einmal unterschritten wurde, und ob der Kurs
+   innerhalb von 26 Wochen wieder unter die Linie sank. Nichts ist
+   vorberechnet; der einzige Regler ist die Mindest-Tauchzeit. */
+let MA=null, UW=null, DIVES=[], EV=[], CUR=null, ST={};
+
+function rechnen(){
+  const N=D.N, H=D.H;
+  MA=new Float64Array(NA).fill(NaN); UW=new Uint8Array(NA);
+  let s=0;
+  for(let i=0;i<NP;i++){ s+=PX[i]; if(i>=N) s-=PX[i-N]; if(i>=N-1) MA[i]=s/N; }
+  /* laufende Woche: die letzten 49 Sonntage plus der Stichtagskurs */
+  let s49=0; for(let i=NP-(N-1);i<NP;i++) s49+=PX[i];
+  MA[NP]=(s49+D.kurs)/N;
+  ST.noetig=s49/(N-1);                       /* Schluss, ab dem die Woche ueber der Linie endet */
+  for(let i=0;i<NA;i++) UW[i]= isFinite(MA[i]) && PX[i]<MA[i] ? 1:0;
+  /* Tauchgaenge */
+  DIVES=[]; let cur=null;
+  for(let i=0;i<NP;i++){
+    if(!isFinite(MA[i])) continue;
+    if(UW[i]){ if(!cur) cur={i0:i,iMin:i}; else if(PX[i]<PX[cur.iMin]) cur.iMin=i; }
+    else if(cur){ cur.i1=i; cur.len=i-cur.i0; DIVES.push(cur); cur=null; }
+  }
+  CUR=cur; if(CUR){ CUR.len=NP-CUR.i0; CUR.i1=null; }
+  EV=[];
+  for(const dv of DIVES){
+    const i=dv.i1, low=PX[dv.iMin];
+    let back=null; for(let j=i+1;j<=Math.min(i+H,NP-1);j++){ if(UW[j]){back=j-i;break;} }
+    let broke=null; for(let j=i+1;j<=NP-1;j++){ if(PX[j]<low){broke=j-i;break;} }
+    const r52 = (i+52<=NP-1)? PX[i+52]/PX[i]-1 : NaN;
+    EV.push({i, i0:dv.i0, iMin:dv.iMin, len:dv.len, low, price:PX[i], ma:MA[i], back, broke, held: broke===null, up:PX[i]/low-1, r52});
+  }
+  const sel=EV.filter(e=>e.len>=S.minDive);
+  ST.n=EV.length; ST.nSel=sel.length;
+  ST.held=sel.filter(e=>e.held).length; ST.heldAll=EV.filter(e=>e.held).length;
+  ST.sank=sel.filter(e=>e.back!==null).length; ST.sankAll=EV.filter(e=>e.back!==null).length;
+  ST.stayed=ST.nSel-ST.sank;
+  /* heute */
+  ST.wUW = CUR? CUR.len : 0; ST.iLow = CUR? CUR.iMin : NP-1; ST.low = PX[ST.iLow];
+  ST.kurs=D.kurs; ST.maNow=MA[NP]; ST.upNow=ST.kurs/ST.low-1; ST.vsNoetig=ST.kurs/ST.noetig-1;
+  ST.ueber = ST.kurs>=ST.noetig;
+  ST.lang = EV.filter(e=>e.len>=13);
+  ST.longMinUp=Math.min(...ST.lang.map(e=>e.up)), ST.longMaxUp=Math.max(...ST.lang.map(e=>e.up));
+  /* Kontrolle: irgendeine Woche ueber der Linie - wie oft binnen H Wochen wieder darunter? */
+  let a=0,b=0; for(let j=N-1;j<NP-H;j++){ if(UW[j]) continue; a++; for(let k=j+1;k<=j+H;k++){ if(UW[k]){b++;break;} } }
+  ST.ctrlN=a; ST.ctrlBack=b;
+}
+
+const pct = (v,d)=> (v>=0?'+':'−')+num(Math.abs(v),d===undefined?1:d)+'%';
+const wk  = v => num(v,0)+' wk';
+
+/* ---- Farben ----
+   Weiss ist der Kurs. Die Wasserlinie und das Wasser sind Meerblau - Wasser
+   ist blau, das erraet jeder ohne Legende (Kanalbetreiber 20.09.2026: "passt
+   lila hier wirklich?" - nein). Die zwei Ausgaenge eines Auftauchens laufen
+   ueber die FORM, nicht ueber eine zweite Farbe: voller oranger Punkt, wenn
+   das Tief des Tauchgangs nie wieder gesehen wurde (Stufe 1) bzw. der Kurs
+   ueber der Linie blieb (Stufe 2); offener weisser Ring, wenn nicht. Keine
+   Skala: die Tauchzeit steht als Laenge auf der Zeitachse und als Groesse
+   der Marke, eine Farbskala waere doppelt. */
+const C_EC=[51,161,242];
+const ec  = al => 'rgba(51,161,242,'+al+')';
+const ecD = al => 'rgba(20,70,120,'+al+')';
+/* Tiefenskala des Wassers: Flachwasser knapp unter der Linie hell, Tiefsee dunkel.
+   Drei Stuetzwerte (159,224,255) -> (51,161,242) -> (27,47,158), Leuchtdichte 212 -> 51
+   (Spanne 161). Skalenende TIEF_MAX = 60 % unter der Linie (2015: -59 %). Die Farbe
+   haengt nur von der Tiefe unter der Oberflaeche ab, nicht von der Woche - deshalb
+   gibt es keine Naehte zwischen den Spalten. */
+const TIEF_MAX=0.60;
+function tiefC(t,al){ t=Math.max(0,Math.min(1,t)); const A=[159,224,255],B=[51,161,242],C=[27,47,158];
+  const m=t<0.5?[A,B,t*2]:[B,C,(t-0.5)*2]; const r=Math.round(m[0][0]+(m[1][0]-m[0][0])*m[2]), g=Math.round(m[0][1]+(m[1][1]-m[0][1])*m[2]), b=Math.round(m[0][2]+(m[1][2]-m[0][2])*m[2]);
+  return 'rgba('+r+','+g+','+b+','+al+')'; }
+const orA = al => 'rgba(247,147,26,'+al+')';
+const blA = al => 'rgba(90,200,250,'+al+')';
+
+/* ===================== Geometrie ===================== */
+function geo(){
+  const W=S.W,H=S.H;
+  /* Ein Pane. Kein Nebenstreifen - was die Episode sagt, steht im Kursverlauf. */
+  return {W,H,L:0,R:W,aT:H*0.015,aB:H*0.902,bar1:H*0.938,bar2:H*0.975};
+}
+function xOf(ts,g){ return g.L + (ts-S.t0)/(T_RIGHT-S.t0)*(g.R-g.L); }
+function tsOf(x,g){ return S.t0 + (x-g.L)/(g.R-g.L)*(T_RIGHT-S.t0); }
+
+let YLO=1,YHI=10;
+function calcY(g){
+  let lo=Infinity,hi=-Infinity;
+  const i1=Math.max(0,iOf(S.t0)-1), i2=NA-1;
+  for(let i=i1;i<=i2;i++){ const v=PX[i]; if(v<lo)lo=v; if(v>hi)hi=v; }
+  if(MA) for(let i=i1;i<=i2;i++){ const v=MA[i]; if(isFinite(v)){ if(v<lo)lo=v; if(v>hi)hi=v; } }
+  if(!isFinite(lo)){lo=pxAt(S.t0);hi=lo;}
+  const sp=Math.log10(Math.max(1.0000001,hi/lo));
+  const pd=Math.min(0.19,Math.max(0.045,sp*0.05));
+  YLO=lo/Math.pow(10,pd*0.95); YHI=hi*Math.pow(10,Math.min(0.75,Math.max(0.22,sp*0.115)));
+}
+function yOf(p,g){
+  const a=Math.log10(YLO),b=Math.log10(YHI);
+  return g.aB-(Math.log10(Math.max(p,YLO*0.2))-a)/(b-a)*(g.aB-g.aT);
+}
+function pxProTag(g){ return (g.R-g.L)*DAY/(T_RIGHT-S.t0); }
+
+function occLast(x,y,w,h){ if(!OCC)return 0; let c=0;
+  const x0=Math.max(0,Math.floor(x/10)),x1=Math.min(OCW-1,Math.ceil((x+w)/10));
+  const y0=Math.max(0,Math.floor(y/10)),y1=Math.min(OCH-1,Math.ceil((y+h)/10));
+  for(let j=y0;j<=y1;j++)for(let i=x0;i<=x1;i++)if(OCC[j*OCW+i])c++;
+  return c; }
+
+/* ===================== Schriftgroessen ===================== */
+const fsAx =W=>Math.max(16,Math.min(32,W*0.0176));
+const fsLab=W=>Math.max(14,Math.min(28,W*0.0152));
+const fsAnn=W=>Math.max(15,Math.min(30,W*0.0164));
+const fsBar=W=>Math.max(13,Math.min(22,W*0.0128));
+
+function kontur(t,x,y,fs,col,align){
+  ctx.save(); ctx.textAlign=align||'left'; ctx.textBaseline='middle';
+  ctx.lineJoin='round'; ctx.lineWidth=Math.max(2,fs*0.26); ctx.strokeStyle='rgba(0,0,0,.82)';
+  ctx.strokeText(t,x,y); ctx.fillStyle=col; ctx.fillText(t,x,y); ctx.restore();
+}
+function platte(t,x,y,fs,col,align){
+  ctx.save(); ctx.font='700 '+fs+'px system-ui,sans-serif'; ctx.textBaseline='middle';
+  const w=ctx.measureText(t).width, px=fs*0.42, py=fs*0.34;
+  let bx=x; if(align==='center')bx=x-w/2; else if(align==='right')bx=x-w;
+  ctx.fillStyle='rgba(0,0,0,.72)';
+  rrect(bx-px,y-fs*0.62-py*0.1,w+px*2,fs*1.24+py*0.2,6); ctx.fill();
+  ctx.textAlign='left'; ctx.fillStyle=col; ctx.fillText(t,bx,y); ctx.restore();
+}
+function rrect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+/* ===================== Belegungskarte ===================== */
+let OCC=null,OCW=0,OCH=0,FOKR=null;
+function occReset(g){ OCW=Math.ceil(g.W/10); OCH=Math.ceil(g.H/10); OCC=new Uint8Array(OCW*OCH); }
+function occAdd(x,y,w,h){ if(!OCC)return; const x0=Math.max(0,Math.floor(x/10)),x1=Math.min(OCW-1,Math.ceil((x+w)/10));
+  const y0=Math.max(0,Math.floor(y/10)),y1=Math.min(OCH-1,Math.ceil((y+h)/10));
+  for(let j=y0;j<=y1;j++)for(let i=x0;i<=x1;i++)OCC[j*OCW+i]=1; }
+function occFree(x,y,w,h){ if(!OCC)return true; const x0=Math.max(0,Math.floor(x/10)),x1=Math.min(OCW-1,Math.ceil((x+w)/10));
+  const y0=Math.max(0,Math.floor(y/10)),y1=Math.min(OCH-1,Math.ceil((y+h)/10));
+  for(let j=y0;j<=y1;j++)for(let i=x0;i<=x1;i++)if(OCC[j*OCW+i])return false; return true; }
+
+/* ===================== Zeichnen ===================== */
+let CAM={sc:1,cx:0.5,cy:0.5};
+let PANR=null, GA=1, G0=null;
+
+function render(now,F){
+  F=F||{};
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  /* Rueckfallkette (27.08.2026): in Vorschauumgebungen ist innerWidth 0 —
+     ohne sie zeichnet der Chart in eine Null-Flaeche. */
+  const wW=Math.round(window.innerWidth||document.documentElement.clientWidth||1440);
+  const wH=Math.round(window.innerHeight||document.documentElement.clientHeight||810);
+  if(cv.width!==Math.round(wW*dpr)||cv.height!==Math.round(wH*dpr)){
+    cv.width=Math.round(wW*dpr); cv.height=Math.round(wH*dpr);
+    cv.style.width=wW+'px'; cv.style.height=wH+'px';
+  }
+  S.W=wW; S.H=wH;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  if(wW<80||wH<80){ ctx.fillStyle='#000'; ctx.fillRect(0,0,Math.max(1,wW),Math.max(1,wH)); return; }
+  const g=geo(); calcY(g); G0=g;
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,g.W,g.H);
+  occReset(g);
+  PANR=null;   /* das Bedienfeld verschiebt keine Chart-Inhalte (03.09.2026) */
+  occAdd(6,6,334,52);
+  if(F.banner){ const fz=Math.max(17,Math.min(34,g.W*0.0192)), yb=g.H*0.085; occAdd(0,yb-fz*2.6,g.W,fz*5.4); }
+
+  const F2=Object.assign({
+    barsA:0, chartA:1, priceP:1, markP:1, rekP:1, rekFrom:0, flutP:1, fokusA:1,
+    grain:0, flash:0, bigText:null, bigSub:null, banner:null, fullText:null, camS:1, camX:0.5
+  },F);
+
+  ctx.save();
+  /* Kamerafahrt abgeschafft (03.09.2026): bei randlosem Datenfeld schneidet jede
+     Vergroesserung oben und links ab. Bewegung kommt aus dem Zeitraum-Regler. */
+  GA=F2.chartA; ctx.globalAlpha=GA;
+  achsen(g);
+  const aF=F2.aFlut===undefined?1:F2.aFlut, aM=F2.aMarke===undefined?1:F2.aMarke, aK=F2.aKurs===undefined?1:F2.aKurs;
+  GA=F2.chartA*aF; ctx.globalAlpha=GA; flut(g,F2);
+  GA=F2.chartA*aM; ctx.globalAlpha=GA; luecke(g,F2); marke(g,F2);
+  GA=F2.chartA*aK; ctx.globalAlpha=GA; kurs(g,F2);
+  GA=F2.chartA; ctx.globalAlpha=GA;
+  if(S.marken){ marken(g,F2); }
+  if(F2.callouts) for(const c of F2.callouts) callout(g,c);
+  ctx.globalAlpha=1;
+  ctx.restore();
+
+  vignette(g);
+
+  ctx.globalAlpha=F2.chartA*F2.fokusA;
+  if(S.texte){ fokus(g); skala(g); }
+  ctx.globalAlpha=F2.chartA;
+  leiste(g,F2);
+  ctx.globalAlpha=1; GA=1;
+
+  if(F2.banner) banner(g,F2.banner,F2.bannerA===undefined?1:F2.bannerA);
+  if(F2.fullText) vollText(g,F2.fullText,F2.fullA===undefined?1:F2.fullA);
+  if(F2.bigText) grosseZahl(g,F2.bigText,F2.bigSub,F2.bigA===undefined?1:F2.bigA);
+  if(F2.barsA>0) balken(g,F2.barsA);
+  if(F2.grain>0) korn(g,F2.grain);
+  if(F2.flash>0){ ctx.fillStyle='rgba(255,255,255,'+F2.flash+')'; ctx.fillRect(0,0,g.W,g.H); }
+}
+
+/* ---------- Achsen ---------- */
+function achsen(g){
+  const fs=fsAx(g.W);
+  ctx.font='600 '+fs+'px system-ui,sans-serif';
+  const lo=Math.log10(YLO), hi=Math.log10(YHI);
+  const dec=hi-lo; const mults = dec>3.2?[1]:(dec>1.6?[1,3]:(dec>0.9?[1,2,5]:[1,1.5,2,3,5,7]));
+  ctx.save(); ctx.globalAlpha=0.72*GA;
+  for(let e=Math.floor(lo);e<=Math.ceil(hi);e++){
+    for(const m of mults){
+      const v=m*Math.pow(10,e); if(v<YLO*1.02||v>YHI*0.99)continue;
+      const y=yOf(v,g);
+      ctx.strokeStyle='rgba(255,255,255,.09)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(g.L,y); ctx.lineTo(g.R,y); ctx.stroke();
+      const t = v>=1000? (v>=1e6? '$'+(v/1e6)+'M' : '$'+(v/1000)+',000') : (v>=1? '$'+v : '$'+v.toFixed(2));
+      const ly=Math.max(g.aT+fs*0.70,Math.min(g.aB-fs*0.70,y-fs*0.75));
+      const lx=g.L+10;
+      kontur(t,lx,ly,fs,'rgba(255,255,255,.92)','left');
+      occAdd(lx-6,ly-fs*0.85,ctx.measureText(t).width+18,fs*1.7);
+    }
+  }
+  ctx.restore();
+  const y0=Math.ceil(yfrac(S.t0)), y1=Math.floor(yfrac(T_RIGHT));
+  const bw=ctx.measureText('2026').width+g.W*0.012;
+  let step=1; while(step<64 && ((y1-y0)/step+1)*bw > g.W*0.78) step++;
+  const first=Math.ceil(y0/step)*step;
+  ctx.save(); ctx.globalAlpha=0.75*GA;
+  for(let y=first;y<=y1;y+=step){
+    const ts=Date.UTC(y,0,1)/1000, x=xOf(ts,g); if(x<g.L+4||x>g.R-4)continue;
+    ctx.strokeStyle='rgba(255,255,255,.10)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x,g.aT); ctx.lineTo(x,g.aB); ctx.stroke();
+    kontur(String(y),x,g.aB-fs*0.85,fs,'rgba(255,255,255,.92)','center');
+    occAdd(x-bw/2,g.aB-fs*1.7,bw,fs*1.7);
+  }
+  ctx.restore();
+  ctx.save(); ctx.globalAlpha=.30*GA; ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,Math.round(g.aB+g.H*0.012)+0.5); ctx.lineTo(g.W,Math.round(g.aB+g.H*0.012)+0.5); ctx.stroke(); ctx.restore();
+}
+
+/* ---------- Das Wasser ----------
+   Die Wasserlinie ist der Durchschnitt der letzten 50 Wochen, auf derselben
+   Dollar-Achse wie der Kurs. Alles darunter ist Wasser: eine Flaeche, die an
+   der Oberflaeche am dichtesten ist und nach unten auslaeuft. Sie beantwortet
+   die Frage, wo "unter Wasser" anfaengt. Wellen: die Oberflaeche noch dreimal
+   nach unten versetzt, immer blasser. */
+function flut(g,F){
+  const P=F.flutP===undefined?1:F.flutP; if(P<=0||!MA) return;
+  const i0=Math.max(D.N-1,iOf(S.t0)-1), i1=NA-1, bis=i0+Math.round((i1-i0)*P);
+  if(bis<=i0) return;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(g.L,g.aT,g.R-g.L,g.aB-g.aT); ctx.clip();
+  let yMin=Infinity;
+  const pts=[]; for(let i=i0;i<=bis;i++){ const x=xOf(tsOfI(i),g), y=yOf(MA[i],g); pts.push([x,y]); if(y<yMin)yMin=y; occAdd(x-3,y-8,6,16); }
+  const xe=pts[pts.length-1][0];
+  const gr=ctx.createLinearGradient(0,yMin,0,g.aB);
+  gr.addColorStop(0,ec(0.26)); gr.addColorStop(0.18,ec(0.10)); gr.addColorStop(0.6,ec(0.04)); gr.addColorStop(1,ec(0.012));
+  ctx.beginPath(); ctx.moveTo(pts[0][0],g.aB);
+  for(const p of pts) ctx.lineTo(p[0],p[1]);
+  ctx.lineTo(xe,g.aB); ctx.closePath(); ctx.fillStyle=gr; ctx.fill();
+  /* Wellen */
+  ctx.lineJoin='round'; ctx.lineCap='round';
+  for(let k=1;k<=3;k++){
+    ctx.strokeStyle=ec(0.16/k); ctx.lineWidth=1.4;
+    ctx.beginPath(); pts.forEach((p,j)=>{ const y=p[1]+k*9+Math.sin(j*0.7+k)*1.2; if(j===0)ctx.moveTo(p[0],y); else ctx.lineTo(p[0],y); });
+    ctx.stroke();
+  }
+  /* Oberflaeche: Neonlinie in drei Zuegen */
+  ctx.strokeStyle=ec(0.16); ctx.lineWidth=13; ctx.beginPath(); pts.forEach((p,j)=>j?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke();
+  ctx.strokeStyle=ec(0.96); ctx.lineWidth=4.2; ctx.shadowColor=ec(0.6); ctx.shadowBlur=16;
+  ctx.beginPath(); pts.forEach((p,j)=>j?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke(); ctx.shadowBlur=0;
+  ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.lineWidth=1.3;
+  ctx.beginPath(); pts.forEach((p,j)=>j?ctx.lineTo(p[0],p[1]-1.6):ctx.moveTo(p[0],p[1]-1.6)); ctx.stroke();
+  /* Lichtpunkt an der Spitze, solange sie sich zeichnet */
+  if(P<1){ const p=pts[pts.length-1]; ctx.fillStyle=WH; ctx.shadowColor=ec(0.9); ctx.shadowBlur=18;
+    ctx.beginPath(); ctx.arc(p[0],p[1],5,0,7); ctx.fill(); ctx.shadowBlur=0; }
+  ctx.restore();
+}
+
+/* ---------- Die Tauchgaenge ----------
+   Wo der Kurs unter der Wasserlinie schliesst, ist er unter Wasser: die
+   Flaeche zwischen Oberflaeche und Kurs wird dichter gefuellt als das
+   uebrige Wasser. Ihre Laenge auf der Zeitachse IST die Tauchzeit - deshalb
+   braucht sie keine Farbskala. Kurze Tauchgaenge unter der Mindest-Tauchzeit
+   werden gedaempft, nie unter 0,45. */
+function luecke(g,F){
+  const P=F.rekP===undefined?1:F.rekP; if(P<=0.01||!MA) return;
+  const i0=Math.max(D.N-1,iOf(S.t0)-1), i1=NA-1;
+  const bis=i0+Math.round((i1-i0)*P); if(bis<=i0) return;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(g.L,g.aT,g.R-g.L,g.aB-g.aT); ctx.clip();
+  /* welcher Tauchgang gehoert zu Woche i (fuer die Daempfung) */
+  const alle=CUR?DIVES.concat([Object.assign({},CUR,{i1:NA})]):DIVES;
+  for(const dv of alle){
+    const a=Math.max(i0,dv.i0-1), b=Math.min(bis,dv.i1);
+    if(b<=a) continue;
+    const dim = dv.len>=(F.minDive||S.minDive) ? 1 : 0.5;
+    for(let i=a;i<b;i++){
+      const x0=xOf(tsOfI(i),g), x1=xOf(tsOfI(i+1),g); if(x1<g.L-4||x0>g.R+4) continue;
+      const ym0=yOf(MA[i],g), ym1=yOf(MA[i+1],g), yp0=yOf(Math.min(PX[i],MA[i]),g), yp1=yOf(Math.min(PX[i+1],MA[i+1]),g);
+      const yt=Math.min(ym0,ym1), yb=Math.max(yp0,yp1); if(yb-yt<0.8) continue;
+      /* Tiefe am unteren Rand der Spalte, in Anteilen der Linie; Farbe entlang der Tiefe */
+      const d=Math.max(1-Math.min(PX[i],PX[i+1])/Math.max(MA[i],MA[i+1]),0)/TIEF_MAX;
+      const gr=ctx.createLinearGradient(0,yt,0,yb);
+      for(let k=0;k<=4;k++){ const f=k/4; gr.addColorStop(f,tiefC(f*d,(0.86-0.10*f)*dim)); }
+      ctx.fillStyle=gr;
+      /* Spalten um 0,8 px ueberlappen lassen: sonst zeichnet die Kantenglaettung helle Naehte */
+      ctx.beginPath(); ctx.moveTo(x0,ym0); ctx.lineTo(x1+0.8,ym1); ctx.lineTo(x1+0.8,yp1); ctx.lineTo(x0,yp0); ctx.closePath(); ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+/* ---------- Der Kurs ----------
+   Ein Pane, und darin der Bitcoin-Kurs von 2010 bis heute auf der
+   Kalenderachse. Weiss, mit Schein. Unter Wasser wird der Schein zu einem
+   violetten Hof: derselbe Kurs, nur getaucht. */
+function kurs(g,F){
+  const P = F.priceP===undefined?1:F.priceP;
+  if(P<=0) return;
+  const i0=Math.max(0,iOf(S.t0)-1), i1=NA-1;
+  const bis = i0 + Math.round((i1-i0)*P);
+  ctx.save();
+  ctx.beginPath(); ctx.rect(g.L,g.aT,g.R-g.L,g.aB-g.aT); ctx.clip();
+  ctx.lineJoin='round'; ctx.lineCap='round';
+  /* violetter Hof unter Wasser */
+  ctx.strokeStyle=ec(0.28); ctx.lineWidth=11;
+  for(let i=i0;i<bis;i++){ if(!(UW[i]&&UW[i+1])) continue;
+    ctx.beginPath(); ctx.moveTo(xOf(tsOfI(i),g),yOf(PX[i],g)); ctx.lineTo(xOf(tsOfI(i+1),g),yOf(PX[i+1],g)); ctx.stroke(); }
+  ctx.strokeStyle='rgba(255,255,255,.97)'; ctx.lineWidth=4.4;
+  ctx.shadowColor='rgba(255,255,255,.32)'; ctx.shadowBlur=14;
+  ctx.beginPath();
+  for(let i=i0;i<=bis;i++){ const x=xOf(tsOfI(i),g), y=yOf(PX[i],g); if(i===i0)ctx.moveTo(x,y); else ctx.lineTo(x,y); occAdd(x-3,y-7,6,14); }
+  ctx.stroke(); ctx.shadowBlur=0;
+  ctx.restore();
+  if(bis>=i1){
+    const x=xOf(tsOfI(i1),g), y=yOf(PX[i1],g);
+    const ph=(performance.now()%4000)/4000;
+    ctx.save(); ctx.globalAlpha=(0.55-0.35*ph)*GA;
+    ctx.strokeStyle=WH; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.arc(x,y,6.4+5.6*ph,0,7); ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.globalAlpha=GA; ctx.fillStyle=WH;
+    ctx.beginPath(); ctx.arc(x,y,6.4,0,7); ctx.fill(); ctx.restore();
+  }
+}
+
+/* ---------- Die Schwelle ----------
+   Der Wochenschluss, ab dem die laufende Woche ueber der Linie endet: ein
+   kurzer oranger Strich am rechten Rand, auf Hoehe dieses Werts. Nur in
+   Stufe 3 (Heute Abend) und in der Sequenz - sonst waere er ein zweites
+   Symbol an der teuersten Stelle des Charts. Lichtlauf: ein heller Punkt
+   laeuft die Wasserlinie entlang, wenn sie erklaert wird. */
+function marke(g,F){
+  if(!MA) return;
+  const st=F.stufe||S.stufe;
+  const i0=Math.max(D.N-1,iOf(S.t0)-1), bis=NA-1;
+  if(F.lichtP!==undefined && F.lichtP>0 && F.lichtP<1){
+    ctx.save(); ctx.beginPath(); ctx.rect(g.L,g.aT,g.R-g.L,g.aB-g.aT); ctx.clip();
+    const iL=i0+(bis-i0)*F.lichtP;
+    for(let k=6;k>=0;k--){ const ii=Math.max(i0,iL-k*1.6); const a=Math.floor(ii), b=Math.min(bis,a+1), r=ii-a;
+      const x=xOf(tsOfI(a)+r*(tsOfI(b)-tsOfI(a)),g), y=yOf(MA[a]*Math.pow(MA[b]/MA[a],r),g);
+      ctx.globalAlpha=GA*(k===0?1:0.55-k*0.075); ctx.fillStyle=k===0?WH:EC; ctx.shadowColor=EC; ctx.shadowBlur=k===0?22:0;
+      ctx.beginPath(); ctx.arc(x,y,k===0?7:4.5-k*0.4,0,7); ctx.fill(); }
+    ctx.shadowBlur=0; ctx.globalAlpha=GA; ctx.restore();
+  }
+  const sw=F.schwelleA===undefined?(st===3?1:0):F.schwelleA;
+  if(sw>0.01){
+    const x=xOf(D.standTs,g), y=yOf(ST.noetig,g), w=Math.max(44,g.W*0.05);
+    ctx.save(); ctx.globalAlpha=GA*sw; ctx.lineCap='round';
+    ctx.strokeStyle='rgba(0,0,0,.9)'; ctx.lineWidth=9; ctx.beginPath(); ctx.moveTo(x-w,y); ctx.lineTo(x+w*0.5,y); ctx.stroke();
+    ctx.strokeStyle=OR; ctx.lineWidth=4.6; ctx.shadowColor=orA(0.7); ctx.shadowBlur=16; ctx.beginPath(); ctx.moveTo(x-w,y); ctx.lineTo(x+w*0.5,y); ctx.stroke();
+    ctx.restore();
+    occAdd(x-w-4,y-8,w*1.5+8,16);
+  }
+}
+
+/* ---------- Dreieck ---------- */
+function dreieck(x,y,r,up,fill,col){
+  ctx.save(); ctx.lineJoin='round';
+  const s=up?-1:1;
+  ctx.beginPath(); ctx.moveTo(x,y+s*r*1.15); ctx.lineTo(x-r,y-s*r*0.75); ctx.lineTo(x+r,y-s*r*0.75); ctx.closePath();
+  ctx.strokeStyle='rgba(0,0,0,.9)'; ctx.lineWidth=9; ctx.stroke();
+  if(fill){ ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=18; ctx.fill(); ctx.shadowBlur=0; }
+  else { ctx.strokeStyle=col; ctx.lineWidth=3.4; ctx.stroke(); }
+  ctx.restore();
+}
+function etikett(t,x,y,fs,col,opt){
+  ctx.font='700 '+fs+'px system-ui,sans-serif'; const w=ctx.measureText(t).width;
+  const o=opt||{}; const yT=G0?G0.aT:0, yB=G0?G0.aB:S.H;
+  const cand=[]; if(o.links){ cand.push([-(w/2+(o.r||0)+fs*0.9),(o.r||0)+fs*0.9]); cand.push([-(w/2+(o.r||0)+fs*0.9),0]); }
+  for(const c of [-1.9,1.9,-3.5,3.5,-5.1,5.1]) for(const dx of [0,-w*0.75,w*0.75]) cand.push([dx,c*fs]);
+  for(const [dx,dy] of cand){ const yy=y+dy, xx=x+dx; const bx=xx-w/2-8, by=yy-fs;
+    if(by<yT||by+fs*2>yB||bx<0||bx+w+16>S.W) continue;
+    if(occFree(bx,by,w+16,fs*2)){ platte(t,xx,yy,fs,col,'center'); occAdd(bx,by,w+16,fs*2); return true; } }
+  return false;
+}
+
+/* ---------- Marken ----------
+   Genau ein Symbol je Auftauchen: eine Scheibe auf der Wasserlinie, dort wo
+   der Kurs sie von unten durchstoesst. Groesse = Tauchzeit (Wurzel der
+   Wochen). Farbe = Ausgang der Frage der Stufe: Stufe 1 orange, wenn das
+   Tief des Tauchgangs nie wieder gesehen wurde, blau wenn doch; Stufe 2
+   orange, wenn der Kurs 26 Wochen ueber der Linie blieb, blau wenn er
+   wieder sank. Auftauchen unter der Mindest-Tauchzeit: gedaempft, halb so
+   gross, ohne Etikett. Etikett: nur die Zahl der Wochen. Stufe 3: der
+   laufende Tauchgang mit pulsierendem Ring an seinem Tief. */
+function radius(len){ return 6+1.9*Math.sqrt(len); }
+function marken(g,F){
+  const P = F.markP===undefined?1:F.markP;
+  if(P<=0.01 || !MA) return;
+  const fsA=fsAnn(g.W), fsL=fsLab(g.W);
+  const st=F.stufe||S.stufe;
+  const order=EV.map((e,k)=>k).sort((a,b)=>EV[a].len-EV[b].len);   /* kurze zuerst, lange zuletzt */
+  ctx.save();
+  order.forEach((k,rank)=>{ const e=EV[k]; const x=xOf(tsOfI(e.i),g), y=yOf(e.ma,g); if(x<g.L-30||x>g.R+30) return;
+    const loc=Math.max(0,Math.min(1,(P-rank*0.045)/0.45)); if(loc<=0) return;
+    const zaehlt=e.len>=(F.minDive||S.minDive);
+    const gut = st===2 ? e.back===null : e.held;
+    const col=gut?OR:'rgba(255,255,255,.95)';
+    const r=radius(e.len)*(zaehlt?1:0.62)*(0.55+0.45*loc);
+    ctx.save(); ctx.globalAlpha=GA*P*loc*(zaehlt?1:0.5);
+    ctx.fillStyle='rgba(0,0,0,.95)'; ctx.beginPath(); ctx.arc(x,y,r+3.5,0,7); ctx.fill();
+    if(gut){
+      if(zaehlt){ ctx.shadowColor=orA(0.8); ctx.shadowBlur=loc<1?30:18; }
+      ctx.fillStyle=OR; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill(); ctx.shadowBlur=0;
+      ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.lineWidth=1.4; ctx.beginPath(); ctx.arc(x,y,r*0.62,0,7); ctx.stroke();
+    } else {
+      /* offener Ring: das Tief hat nicht gehalten */
+      ctx.strokeStyle=col; ctx.lineWidth=Math.max(2.4,r*0.24); if(zaehlt){ ctx.shadowColor='rgba(255,255,255,.6)'; ctx.shadowBlur=loc<1?22:10; }
+      ctx.beginPath(); ctx.arc(x,y,r-ctx.lineWidth/2,0,7); ctx.stroke(); ctx.shadowBlur=0;
+    }
+    ctx.restore();
+    occAdd(x-r-4,y-r-4,r*2+8,r*2+8);
+    if(zaehlt && loc>0.4 && !(F.ohneEtikett)) { ctx.save(); ctx.globalAlpha=GA*P*Math.min(1,(loc-0.4)/0.4); etikett(wk(e.len), x, y-r-fsL*0.9, fsL, col); ctx.restore(); }
+  });
+  ctx.restore();
+  /* der laufende Tauchgang: Ring am Tief, Ring an der Stelle, wo er auftauchen wuerde */
+  if(CUR && P>0.5){
+    const a=Math.min(1,(P-0.5)/0.5);
+    const xl=xOf(tsOfI(ST.iLow),g), yl=yOf(ST.low,g);
+    if(xl>g.L-20 && xl<g.R+20){
+      ctx.save(); ctx.globalAlpha=GA*a;
+      ctx.fillStyle='rgba(0,0,0,.9)'; ctx.beginPath(); ctx.arc(xl,yl,11,0,7); ctx.fill();
+      ctx.fillStyle=WH; ctx.shadowColor='rgba(255,255,255,.7)'; ctx.shadowBlur=14; ctx.beginPath(); ctx.arc(xl,yl,7.5,0,7); ctx.fill();
+      const ph=(performance.now()%1200)/1200; ctx.shadowBlur=0; ctx.globalAlpha=GA*a*(0.6-0.55*ph); ctx.strokeStyle=WH; ctx.lineWidth=2.4;
+      ctx.beginPath(); ctx.arc(xl,yl,11+18*ph,0,7); ctx.stroke();
+      ctx.restore();
+      occAdd(xl-16,yl-16,32,32);
+      if(st===3 && !(F.ohneEtikett)) etikett('$'+num(ST.low,0), xl, yl, fsL, 'rgba(255,255,255,.95)', {links:true, r:13});
+    }
+    const xr=xOf(D.standTs,g), yr=yOf(ST.maNow,g), rr=radius(ST.wUW);
+    if(st!==2 || true){
+      ctx.save(); ctx.globalAlpha=GA*a; ctx.setLineDash([5,5]);
+      ctx.strokeStyle='rgba(0,0,0,.9)'; ctx.lineWidth=7; ctx.beginPath(); ctx.arc(xr,yr,rr,0,7); ctx.stroke();
+      ctx.strokeStyle=ST.ueber?OR:'rgba(255,255,255,.9)'; ctx.lineWidth=3.0; ctx.beginPath(); ctx.arc(xr,yr,rr,0,7); ctx.stroke();
+      ctx.restore();
+      occAdd(xr-rr-4,yr-rr-4,rr*2+8,rr*2+8);
+      if(!(F.ohneEtikett)) etikett(wk(ST.wUW), xr, yr, fsL, 'rgba(255,255,255,.95)', {links:true, r:rr});
+    }
+  }
+}
+
+/* ---------- Callout ----------
+   Kein Kasten, keine Verbindungslinie (19.09.2026): der Punkt leuchtet auf,
+   und daneben steht das Etikett als freie Konturschrift in der Farbe des
+   Elements. Hoechstens zwei kurze Zeilen; Woerter zwischen * in Orange. */
+function callout(g,c){
+  const a=c.a===undefined?1:c.a; if(a<=0.01) return;
+  if(c.ts!==undefined){ c.x=xOf(c.ts,g); c.y=yOf(c.v,g); }
+  const fs=fsAnn(g.W)*1.3; ctx.font='800 '+fs+'px system-ui,sans-serif';
+  const lines=c.text.split(String.fromCharCode(10));
+  /* Pulsring: der Punkt, um den es geht, pulsiert statt beschriftet zu werden (19.09.2026) */
+  if(c.puls){ const ph=(performance.now()%1200)/1200; ctx.save(); ctx.globalAlpha=GA*a*(0.7-0.6*ph);
+    ctx.strokeStyle=c.col||WH; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(c.x,c.y,15+22*ph,0,7); ctx.stroke(); ctx.restore(); }
+  const widths=lines.map(l=>{ let lw=0; for(const [t] of teile(l)) lw+=ctx.measureText(t).width; return lw; });
+  const w=Math.max(...widths), h=lines.length*fs*1.25;
+  const col=c.col||WH;
+  ctx.save(); ctx.globalAlpha=GA*a;
+  /* Leuchtpunkt */
+  if(!c.ohnePunkt){
+    ctx.shadowColor=col; ctx.shadowBlur=26; ctx.fillStyle=col;
+    ctx.beginPath(); ctx.arc(c.x,c.y,7.5,0,7); ctx.fill(); ctx.shadowBlur=0;
+    ctx.strokeStyle='rgba(0,0,0,.9)'; ctx.lineWidth=2.4; ctx.beginPath(); ctx.arc(c.x,c.y,7.5,0,7); ctx.stroke();
+    ctx.strokeStyle=col; ctx.lineWidth=2.2; ctx.globalAlpha=GA*a*0.55; ctx.beginPath(); ctx.arc(c.x,c.y,15,0,7); ctx.stroke();
+  }
+  ctx.globalAlpha=GA*a;
+  /* Text: rechtsbuendig links vom Punkt (Standard) oder linksbuendig rechts davon;
+     mit auto: die der vier Lagen, die am wenigsten Gezeichnetes verdeckt */
+  let right=(c.side==='right'), dy=c.dy||0;
+  if(c.auto){ let best=1e9; const d=Math.abs(c.dy||fs*1.5);
+    for(const dd of [-d,d,-1.9*d,1.9*d]) for(const rr of [false,true]){ let tx0=rr? c.x+fs*1.1 : c.x-fs*1.1-w, ty0=c.y+dd-h/2;
+      if(tx0<8||tx0+w>g.W-8||ty0<g.aT||ty0+h>g.aB) continue;
+      const n=occLast(tx0-fs*0.5,ty0-fs*0.5,w+fs,h+fs); if(n<best){best=n;right=rr;dy=dd; if(n===0) break;} } }
+  let tx=right? c.x+fs*1.1 : c.x-fs*1.1, ty=c.y+dy-h/2+fs*0.62;
+  if(right){ if(tx+w>g.W-8) tx=g.W-8-w; } else { if(tx-w<8) tx=8+w; }
+  ty=Math.max(g.aT+fs*0.7,Math.min(g.aB-h,ty));
+  occAdd((right?tx:tx-w)-fs*0.3, ty-fs*0.62-fs*0.3, w+fs*0.6, h+fs*0.6);
+  ctx.textBaseline='middle'; ctx.lineJoin='round';
+  lines.forEach((l,i)=>{ const y=ty+i*fs*1.25; let x=right?tx:tx-widths[i];
+    for(const [t,on] of teile(l)){ ctx.lineWidth=fs*0.24; ctx.strokeStyle='rgba(0,0,0,.88)'; ctx.textAlign='left';
+      ctx.strokeText(t,x,y); ctx.fillStyle=on?OR:col; ctx.fillText(t,x,y); x+=ctx.measureText(t).width; } });
+  ctx.restore();
+}
+
+/* ---------- Schluessel der Tiefenskala ----------
+   Ein senkrechter Farbverlauf mit zwei Zahlen: 0 % an der Oberflaeche, das
+   Skalenende unten. Er sucht sich eine freie Flaeche, bevorzugt links oben. */
+function skala(g){
+  const fs=fsBar(g.W), bw=fs*0.9, bh=fs*4.8;
+  ctx.font='700 '+fs+'px system-ui,sans-serif';
+  const t1='0%', t2='−'+num(TIEF_MAX*100,0)+'%';
+  const tw=ctx.measureText(t2).width;
+  const W=bw+fs*0.6+tw+16, H=bh+fs*2.6;
+  let bx=-1,by=-1,best=1e9;
+  for(let fy=0.05;fy<=0.70;fy+=0.03){ for(let fx=0.10;fx<=0.90;fx+=0.02){
+    const xx=g.W*fx, yy=g.aT+(g.aB-g.aT)*fy; if(xx+W>g.W-10||yy+H>g.aB-10) continue;
+    const c=occLast(xx-8,yy-8,W+16,H+16); if(c<best){best=c;bx=xx;by=yy; if(c===0){fy=99;break;}} } }
+  if(best>0) return;   /* keine freie Flaeche: der Schluessel entfaellt */
+  ctx.save();
+  const gk=ctx.createLinearGradient(0,by+fs*1.2,0,by+fs*1.2+bh); for(let k=0;k<=8;k++) gk.addColorStop(k/8,tiefC(k/8,0.95));
+  ctx.fillStyle=gk; rrect(bx,by+fs*1.2,bw,bh,3); ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=1; rrect(bx,by+fs*1.2,bw,bh,3); ctx.stroke();
+  kontur(t1,bx+bw+fs*0.6,by+fs*1.2+fs*0.4,fs,'rgba(255,255,255,.88)','left');
+  kontur(t2,bx+bw+fs*0.6,by+fs*1.2+bh-fs*0.4,fs,'rgba(255,255,255,.88)','left');
+  ctx.restore();
+  occAdd(bx-8,by-8,W+16,H+16);
+}
+
+function fokus(g){
+  let kopf,zahl,lab,col,sch;
+  const st=S.stufe;
+  const nach = S.minDive>1 ? 'dives '+num(S.minDive,0)+'+ wk' : 'every dive';
+  if(st===1){ kopf='LOW NEVER SEEN AGAIN'; zahl=num(ST.held,0)+' of '+num(ST.nSel,0);
+    lab=nach; col=ST.held*2>=ST.nSel?OR:'rgba(255,255,255,.95)'; sch=col===OR?orA(0.55):'rgba(255,255,255,.4)'; }
+  else if(st===2){ kopf='SANK WITHIN 26 WEEKS'; zahl=num(ST.sank,0)+' of '+num(ST.nSel,0);
+    lab=nach; col=ST.sank*2>ST.nSel?'rgba(255,255,255,.95)':OR; sch=col===OR?orA(0.55):'rgba(255,255,255,.4)'; }
+  else { kopf='SUNDAY CLOSE TO SURFACE'; zahl='$'+num(ST.noetig,0);
+    lab='now $'+num(ST.kurs,0)+' · '+num(ST.wUW,0)+' wk under'; col=ST.ueber?OR:'rgba(255,255,255,.95)'; sch=ST.ueber?orA(0.55):'rgba(255,255,255,.4)'; }
+
+  const fsK=Math.max(13,Math.min(23,g.W*0.0126));
+  const fsZ=Math.max(34,Math.min(84,g.W*0.0480));
+  const fsL=Math.max(14,Math.min(27,g.W*0.0152));
+  ctx.font='800 '+fsZ+'px system-ui,sans-serif';
+  const wZ=ctx.measureText(zahl).width;
+  ctx.font='700 '+fsK+'px system-ui,sans-serif';
+  const wK=ctx.measureText(kopf).width;
+  ctx.font='700 '+fsL+'px system-ui,sans-serif';
+  const wL=ctx.measureText(lab).width;
+  const bw=Math.max(wZ,wK,wL)+26;
+  const bh=fsK*1.5+fsZ*1.30+fsL*1.5+10;
+  const kx=[]; for(let f=0.02;f<=0.99;f+=0.035){ const xx=g.W*f; if(xx+bw<g.W-g.W*0.012) kx.push(xx); }
+  let bx=kx[0], by=g.aT+(g.aB-g.aT)*0.06, best=1e9;
+  for(let f=0.02;f<=0.80;f+=0.03){
+    const cy=g.aT+(g.aB-g.aT)*f; if(cy+bh>g.aB-6)continue;
+    for(const xx of kx){
+      let c=occLast(xx-10,cy-10,bw+20,bh+20);
+      c+= (cy > g.aT+(g.aB-g.aT)*0.86 ? 3 : 0);
+      if(c<best){best=c;bx=xx;by=cy; if(c===0){f=99;break;}}
+    }
+  }
+  ctx.save();
+  let y=by+fsK*0.7;
+  ctx.font='700 '+fsK+'px system-ui,sans-serif';
+  kontur(kopf,bx,y,fsK,'rgba(255,255,255,.72)','left'); y+=fsK*1.4;
+  ctx.font='800 '+fsZ+'px system-ui,sans-serif';
+  y+=fsZ*0.66;
+  ctx.save(); ctx.textBaseline='middle'; ctx.textAlign='left';
+  ctx.shadowBlur=26; ctx.shadowColor=sch;
+  ctx.lineJoin='round'; ctx.lineWidth=fsZ*0.20; ctx.strokeStyle='rgba(0,0,0,.85)';
+  ctx.strokeText(zahl,bx,y); ctx.shadowBlur=0;
+  ctx.fillStyle=col; ctx.fillText(zahl,bx,y); ctx.restore();
+  y+=fsZ*0.66;
+  ctx.font='700 '+fsL+'px system-ui,sans-serif';
+  y+=fsL*0.95; kontur(lab,bx,y,fsL,'rgba(255,255,255,.88)','left');
+  ctx.restore();
+  occAdd(bx-16,by-14,bw+32,bh+22);
+  FOKR=[bx-16,by-14,bw+32,bh+22];
+}
+
+/* ---------- untere Leiste ----------
+   Drei Legendeneintraege, eine tragende Ablesung. Mehr steht hier nicht
+   (Textbilanz, 19.09.2026). */
+function leiste(g,F){
+  const fs=fsBar(g.W);
+  wortmarke(g, g.W*0.012, (g.bar1+g.bar2)/2, Math.max(74,g.W*0.072));
+  if(!S.texte) return;
+  const x0=g.W*0.012+Math.max(74,g.W*0.072)+g.W*0.022;
+  ctx.font='700 '+fs+'px system-ui,sans-serif';
+  let x=x0+fs*4.6;
+  /* die weisse Kurslinie braucht weder Wort noch Swatch (Textbilanz 19.09.2026) */
+  /* 1 - die Wasserlinie */
+  ctx.save(); ctx.fillStyle=ec(0.28); ctx.fillRect(x,g.bar1-fs*0.05,fs*2.2,fs*0.62);
+  ctx.strokeStyle=EC; ctx.lineCap='round'; ctx.lineWidth=4.2; ctx.beginPath(); ctx.moveTo(x,g.bar1); ctx.lineTo(x+fs*2.2,g.bar1); ctx.stroke(); ctx.restore();
+  const e1='50-week average';
+  kontur(e1,x+fs*2.6,g.bar1,fs,'rgba(255,255,255,.88)','left');
+  x+=fs*2.6+ctx.measureText(e1).width+g.W*0.018;
+  /* 2/3 - die zwei Pole */
+  const st=S.stufe;
+  const e2 = st===2 ? 'stayed' : 'held', e3 = st===2 ? 'sank' : 'broken';
+  ctx.save(); ctx.fillStyle=OR; ctx.beginPath(); ctx.arc(x+fs*0.5,g.bar1,fs*0.42,0,7); ctx.fill(); ctx.restore();
+  kontur(e2,x+fs*1.3,g.bar1,fs,'rgba(255,255,255,.88)','left');
+  x+=fs*1.3+ctx.measureText(e2).width+g.W*0.014;
+  ctx.save(); ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=2.2; ctx.beginPath(); ctx.arc(x+fs*0.5,g.bar1,fs*0.36,0,7); ctx.stroke(); ctx.restore();
+  kontur(e3,x+fs*1.3,g.bar1,fs,'rgba(255,255,255,.88)','left');
+  const ab=num(ST.wUW,0)+' weeks under · since '+dstr(tsOfI(CUR?CUR.i0:NP-1));
+  ctx.font='800 '+fs*1.04+'px system-ui,sans-serif';
+  kontur(ab,x0,g.bar2,fs*1.04,'rgba(255,255,255,.92)','left');
+}
+
+
+function wortmarke(g,x,yMid,w){
+  const h1=w*0.26, pitch=h1*0.90;
+  ctx.save(); ctx.textBaseline='middle'; ctx.textAlign='left';
+  ctx.font='900 '+h1+'px system-ui,sans-serif';
+  const wA=ctx.measureText('GREAT').width;
+  const wB1=ctx.measureText('WALL').width, wB2=ctx.measureText('Y').width;
+  const y1=yMid-pitch/2, y2=yMid+pitch/2;
+  ctx.save(); ctx.translate(x,y1); ctx.scale(w/wA,1);
+  ctx.fillStyle='rgba(255,255,255,.95)'; ctx.fillText('GREAT',0,0); ctx.restore();
+  const sc=w/(wB1+wB2);
+  ctx.save(); ctx.translate(x,y2); ctx.scale(sc,1);
+  ctx.fillStyle=OR; ctx.fillText('WALL',0,0);
+  ctx.fillStyle='rgba(255,255,255,.95)'; ctx.fillText('Y',wB1,0); ctx.restore();
+  ctx.restore();
+}
+function vignette(g){
+  const r=Math.max(g.W,g.H)*0.78;
+  const gr=ctx.createRadialGradient(g.W*0.5,g.H*0.46,r*0.36,g.W*0.5,g.H*0.46,r);
+  gr.addColorStop(0,'rgba(0,0,0,0)'); gr.addColorStop(1,'rgba(0,0,0,.58)');
+  ctx.fillStyle=gr; ctx.fillRect(0,0,g.W,g.H);
+}
+
+/* ===================== Kino ===================== */
+function balken(g,a){
+  const h=g.H*0.12*a;
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,g.W,h); ctx.fillRect(0,g.H-h,g.W,h);
+}
+let KORN=null;
+function korn(g,a){
+  if(!KORN){ const c=document.createElement('canvas'); c.width=c.height=170;
+    const x=c.getContext('2d'), im=x.createImageData(170,170);
+    for(let i=0;i<im.data.length;i+=4){const v=Math.random()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255;}
+    x.putImageData(im,0,0); KORN=c; }
+  ctx.save(); ctx.globalAlpha=a*0.13; ctx.globalCompositeOperation='overlay';
+  for(let y=0;y<g.H;y+=170)for(let x=0;x<g.W;x+=170)ctx.drawImage(KORN,x,y);
+  ctx.restore();
+}
+function teile(t){
+  const out=[]; let i=0,cur='',on=false;
+  while(i<t.length){ if(t[i]==='*'){ if(cur)out.push([cur,on]); cur=''; on=!on; i++; }
+    else { cur+=t[i]; i++; } }
+  if(cur)out.push([cur,on]); return out;
+}
+function vollText(g,txt,a){
+  const lines=txt.split('\n');
+  let fs=Math.min(g.W*0.052,g.H*0.085);
+  ctx.font='900 '+fs+'px system-ui,sans-serif';
+  let mx=0; for(const l of lines) mx=Math.max(mx,ctx.measureText(l.replace(/\*/g,'')).width);
+  while(mx>g.W*0.84 && fs>16){ fs*=0.94; ctx.font='900 '+fs+'px system-ui,sans-serif';
+    mx=0; for(const l of lines) mx=Math.max(mx,ctx.measureText(l.replace(/\*/g,'')).width); }
+  ctx.save(); ctx.globalAlpha=a;
+  const gy=g.H*0.42, lh=fs*1.24, y0=gy-(lines.length-1)*lh/2;
+  ctx.font='900 '+fs+'px system-ui,sans-serif'; ctx.textBaseline='middle';
+  lines.forEach((l,i)=>{
+    const seg=teile(l); let w=0; for(const [s] of seg) w+=ctx.measureText(s).width;
+    let x=g.W/2-w/2; const y=y0+i*lh;
+    for(const [s,on] of seg){
+      ctx.lineJoin='round'; ctx.lineWidth=fs*0.20; ctx.strokeStyle='rgba(0,0,0,.85)';
+      ctx.textAlign='left'; ctx.strokeText(s,x,y);
+      ctx.fillStyle=on?OR:WH; ctx.fillText(s,x,y); x+=ctx.measureText(s).width;
+    }
+  });
+  ctx.restore();
+}
+function banner(g,txt,a){
+  const [lab,zeile]=txt;
+  const fsL=Math.max(13,Math.min(24,g.W*0.0125)), fsZ=Math.max(17,Math.min(34,g.W*0.0192));
+  const y=g.H*0.085;
+  const gr=ctx.createLinearGradient(0,y-fsZ*2.6,0,y+fsZ*2.8);
+  gr.addColorStop(0,'rgba(0,0,0,0)'); gr.addColorStop(.45,'rgba(0,0,0,.70)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=gr; ctx.fillRect(0,y-fsZ*2.6,g.W,fsZ*5.4);
+  ctx.font='800 '+fsL+'px system-ui,sans-serif';
+  if(lab) kontur(lab,g.W/2,y-fsZ*0.85,fsL,'rgba(247,147,26,.95)','center');
+  let fs=fsZ; ctx.font='800 '+fs+'px system-ui,sans-serif';
+  while(ctx.measureText(zeile.replace(/\*/g,'')).width>g.W*0.86&&fs>14){fs*=0.94;ctx.font='800 '+fs+'px system-ui,sans-serif';}
+  const seg=teile(zeile); let w=0; for(const [s] of seg)w+=ctx.measureText(s).width;
+  let x=g.W/2-w/2; ctx.textBaseline='middle';
+  for(const [s,on] of seg){ ctx.lineJoin='round'; ctx.lineWidth=fs*0.22; ctx.strokeStyle='rgba(0,0,0,.85)';
+    ctx.textAlign='left'; ctx.strokeText(s,x,y+fs*0.45); ctx.fillStyle=on?OR:WH; ctx.fillText(s,x,y+fs*0.45);
+    x+=ctx.measureText(s).width; }
+  ctx.restore();
+}
+function grosseZahl(g,t,sub,a){
+  let fs=Math.min(g.W*0.115,g.H*0.20);
+  ctx.font='900 '+fs+'px system-ui,sans-serif';
+  while(ctx.measureText(t).width>g.W*0.86&&fs>20){fs*=0.94;ctx.font='900 '+fs+'px system-ui,sans-serif';}
+  const y=g.H*0.42;
+  ctx.save(); ctx.globalAlpha=a; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowBlur=42; ctx.shadowColor='rgba(247,147,26,.65)'; ctx.fillStyle=OR; ctx.fillText(t,g.W/2,y);
+  ctx.shadowBlur=0; ctx.fillText(t,g.W/2,y);
+  if(sub){ let fs2=Math.max(15,Math.min(30,g.W*0.0166));
+    ctx.font='700 '+fs2+'px system-ui,sans-serif';
+    while(ctx.measureText(sub).width>g.W*0.86&&fs2>13){fs2*=0.94;ctx.font='700 '+fs2+'px system-ui,sans-serif';}
+    ctx.lineJoin='round'; ctx.lineWidth=fs2*0.22; ctx.strokeStyle='rgba(0,0,0,.85)';
+    ctx.strokeText(sub,g.W/2,y+fs*0.72); ctx.fillStyle='rgba(255,255,255,.92)'; ctx.fillText(sub,g.W/2,y+fs*0.72); }
+  ctx.restore();
+}
+
+/* ===================== Highlight-Tasten s+1 … s+4 =====================
+   Fuer die Aufnahme: s+1, s+2, s+3 arbeiten je EIN Key Takeaway cinematisch heraus,
+   s+4 das One More Thing (Wunsch vom 19.09.2026). Jede Taste ist ein Mini-Film von
+   10-14 s: Ebenen daempfen, heranfahren, Marken gestaffelt, Etiketten am Objekt,
+   dann die grosse Zahl mit Balken und dem Satz darunter, danach steht das Bild mit
+   den Etiketten bis irgendeine Taste gedrueckt wird; Zustand wird zurueckgelegt.
+   Kein Banner, kein Kasten, kein Hinweis im Bild. Die Liste HL_DEFS ist je Episode
+   anders; der Rahmen (Tasten, Schleife, Rueckgabe) gehoert zum Geruest. */
+const HL={start:0,n:0,sichern:null};
+const hlEase=x=>x<0?0:x>1?1:(1-Math.cos(Math.PI*x))/2;
+const NL10=String.fromCharCode(10);
+/* die grosse Zahl: Balken zu, Chart gedimmt, Zahl mit Schein, Satz darunter; a = 0..1 Einblendung */
+function hlUrteil(F,a,zahl,satz){ F.barsA=0.55*a; F.chartA=1-0.65*a; F.fokusA=0; F.grain=0.12*a; F.bigText=zahl; F.bigSub=satz; F.bigA=a; }
+/* Etiketten an Auftauch-Marken: Datenkoordinaten, nur die Zahl */
+const cEV=(e,txt,a,col,dy)=>({ts:tsOfI(e.i),v:e.ma,dy:dy===undefined?-fsAnn(S.W||1280)*1.9:dy,text:txt,col:col||OR,a,puls:true,auto:true});
+const HL_DEFS=[
+  /* ---- s+1 · Takeaway 1: Das Auftauchen allein ist ein Muenzwurf ---- */
+  {dauer:13000, f:(t,F)=>{
+    const T_ZOOM=Date.UTC(2018,11,30)/1000, fA=fsAnn(S.W||1280);
+    F.stufe=2; F.minDive=1; F.aFlut=0.6; F.aMarke=0.7; F.ohneEtikett=true;
+    F.t0=T_MIN+(T_ZOOM-T_MIN)*hlEase(t/2.4);                       /* 0-2,4 s heranfahren */
+    F.markP=hlEase((t-2.0)/3.2);                                    /* 2-5,2 s Marken gestaffelt */
+    F.callouts=[];
+    const fails=[]; for(const e of EV.slice().reverse()){ if(e.back===null||e.i<iOf(T_ZOOM)) continue; if(fails.length&&fails[fails.length-1].i-e.i<26) continue; fails.push(e); if(fails.length>=3) break; }
+    fails.reverse().forEach((e,k)=>{ if(t>4.6+k*0.7) F.callouts.push(cEV(e,num(e.back,0)+' wk',Math.min(1,(t-4.6-k*0.7)/0.6),WH,(k%2?1:-1)*fA*2.0)); });
+    if(t>7.6){ const a=Math.min(1,(t-7.6)/0.6)*(t<11.6?1:Math.max(0,1-(t-11.6)/1.2));           /* 7,6-12,8 s Urteil */
+      hlUrteil(F,a,num(ST.sankAll,0)+' OF '+num(ST.n,0),'SANK AGAIN WITHIN 6 MONTHS'); }
+  }},
+  /* ---- s+2 · Takeaway 2: Nach einem langen Tauchgang kam das Tief nie zurueck ---- */
+  {dauer:14000, f:(t,F)=>{
+    const fA=fsAnn(S.W||1280);
+    F.stufe=1; F.minDive=13; F.t0=T_MIN; F.aFlut=0.7; F.ohneEtikett=true;
+    F.markP=hlEase(t/4.4);                                          /* 0-4,4 s Marken: kurze zuerst, lange zuletzt */
+    F.callouts=[];
+    const lang=EV.filter(e=>e.len>=13);
+    lang.forEach((e,k)=>{ if(t>4.0+k*0.6) F.callouts.push(cEV(e,'*'+num(e.len,0)+' wk*',Math.min(1,(t-4.0-k*0.6)/0.6),OR,(k%2?1:-1)*fA*2.0)); });
+    if(t>8.4){ const a=Math.min(1,(t-8.4)/0.6)*(t<12.6?1:Math.max(0,1-(t-12.6)/1.2));           /* 8,4-13,8 s Urteil */
+      const n=lang.length, h=lang.filter(e=>e.held).length;
+      hlUrteil(F,a,num(h,0)+' OF '+num(n,0),'LOW NEVER SEEN AGAIN'); }
+  }},
+  /* ---- s+3 · Takeaway 3: Die Bestaetigung hat ihren Preis - weit ueber dem Tief ---- */
+  {dauer:13000, f:(t,F)=>{
+    const T_ZOOM=Date.UTC(2022,0,2)/1000, fA=fsAnn(S.W||1280);
+    F.stufe=1; F.minDive=13; F.aFlut=0.6; F.ohneEtikett=true;
+    F.t0=T_MIN+(T_ZOOM-T_MIN)*hlEase(t/2.2);                       /* 0-2,2 s heranfahren */
+    F.markP=hlEase((t-1.8)/2.4);
+    F.callouts=[];
+    const e23=EV[EV.length-1];
+    if(t>3.0) F.callouts.push({ts:tsOfI(e23.iMin),v:e23.low,dy:fA*2.0,text:'*$'+num(e23.low,0)+'*',puls:true,auto:true,a:Math.min(1,(t-3.0)/0.6)});
+    if(t>3.8) F.callouts.push({ts:tsOfI(e23.i),v:e23.ma,dy:-fA*2.4,side:'right',text:'$'+num(e23.price,0),col:OR,puls:true,a:Math.min(1,(t-3.8)/0.6)});
+    if(t>5.0) F.callouts.push({ts:tsOfI(ST.iLow),v:ST.low,dy:fA*2.0,text:'*$'+num(ST.low,0)+'*',puls:true,auto:true,a:Math.min(1,(t-5.0)/0.6)});
+    if(t>5.8) F.callouts.push({ts:D.standTs,v:D.kurs,dy:-fA*2.0,text:'$'+num(D.kurs,0),auto:true,a:Math.min(1,(t-5.8)/0.6)});
+    if(t>7.6){ const a=Math.min(1,(t-7.6)/0.6)*(t<11.6?1:Math.max(0,1-(t-11.6)/1.2));           /* 7,6-12,8 s Urteil */
+      hlUrteil(F,a,pct(ST.upNow*100,0),'ABOVE THE LOW TODAY'); }
+  }},
+  /* ---- s+4 · One More Thing: Der Schluss, der heute Abend zaehlt ---- */
+  {dauer:13000, f:(t,F)=>{
+    const T_ZOOM=Date.UTC(2025,0,5)/1000, fA=fsAnn(S.W||1280);
+    F.stufe=3; F.minDive=13; F.aFlut=0.8; F.ohneEtikett=true;
+    F.t0=T_MIN+(T_ZOOM-T_MIN)*hlEase(t/2.2); F.markP=hlEase((t-1.6)/2.0);
+    F.schwelleA=hlEase((t-3.0)/0.8);
+    F.callouts=[];
+    if(t>2.6) F.callouts.push({ts:tsOfI(ST.iLow),v:ST.low,dy:fA*2.0,text:'*$'+num(ST.low,0)+'*',puls:true,auto:true,a:Math.min(1,(t-2.6)/0.6)});
+    if(t>4.0) F.callouts.push({ts:D.standTs,v:ST.noetig,dy:fA*2.2,text:'*$'+num(ST.noetig,0)+'*',ohnePunkt:true,auto:true,a:Math.min(1,(t-4.0)/0.6)});
+    if(t>5.2) F.callouts.push({ts:D.standTs,v:D.kurs,dy:-fA*2.0,text:'$'+num(D.kurs,0),auto:true,a:Math.min(1,(t-5.2)/0.6)});
+    if(t>7.4){ const a=Math.min(1,(t-7.4)/0.6)*(t<11.6?1:Math.max(0,1-(t-11.6)/1.2));           /* 7,4-12,8 s Urteil */
+      hlUrteil(F,a,'$'+num(ST.noetig,0),'SUNDAY CLOSE TO SURFACE'); }
+  }}
+];
+function hlFrame(ms){ const F={}; const d=HL_DEFS[HL.n-1]; if(d) d.f(Math.min(ms,d.dauer)/1000,F); return F; }
+function startHL(n){ if(!HL_DEFS[n-1]||CIN.start) return; if(HL.start) stopHL(); sichern(); HL.sichern=CIN.sichern; CIN.sichern=null;
+  S.marken=true; S.texte=false; rechnen(); HL.n=n; HL.start=performance.now(); }
+function stopHL(){ HL.start=0; HL.n=0; if(HL.sichern){ CIN.sichern=HL.sichern; HL.sichern=null; zurueck(); } }
+
+/* ===================== Sequenz S+T ===================== */
+const CIN={start:0,dauer:40000,sichern:null};
+
+/* Alle Zahlen werden zur Laufzeit aus den Daten gerechnet. Zwei hervorgehobene
+   Woerter je Beat, kein Fachwort, und kein Wort, dessen Bedeutung im Chart eine
+   andere Farbe traegt. */
+function hookBeats(){
+  const NL=String.fromCharCode(10);
+  const lang=EV.filter(e=>e.len>=13), h=lang.filter(e=>e.held).length;
+  return [
+    '*'+num(ST.wUW,0)+' WEEKS* UNDER WATER'+NL+'NOW BITCOIN *COMES UP*',
+    'THIS IS HOW *EVERY BEAR MARKET*'+NL+'ENDED — *THEY SAY*',
+    '*'+num(ST.sankAll,0)+' OF '+num(ST.n,0)+'* TIMES'+NL+'IT *SANK AGAIN* WITHIN 6 MONTHS',
+    'AFTER A LONG DIVE: *'+num(h,0)+' OF '+num(lang.length,0)+'*'+NL+'*NEVER SAW* THE LOW AGAIN'
+  ];
+}
+function frameFor(ms){
+  const F={}; const t=ms/1000;
+  const beats=hookBeats();
+  const ease=x=>x<0?0:x>1?1:(1-Math.cos(Math.PI*x))/2;
+  const NL=String.fromCharCode(10);
+  F.stufe=1; F.minDive=13;
+  /* Callouts tragen Datenkoordinaten (ts, v); die Bildlage rechnet callout()
+     beim Zeichnen. Jedes Etikett bleibt bis zum Szenenwechsel stehen. */
+  const W=S.W||1280, fA=fsAnn(W);
+  const lang=EV.filter(e=>e.len>=13);
+  const cCUR=a=>({ts:D.standTs,v:D.kurs,dy:-fA*1.8,text:'*'+num(ST.wUW,0)+' wk*',a,puls:true});
+  if(t<18.4){
+    const BE=4.60, BLD=0.45;
+    F.barsA=1; F.chartA=0;
+    F.grain=0.35+0.5*Math.min(1,t/9.2)*(t<9.2?1:Math.max(0,(13.8-t)/4.6));
+    const i=Math.min(3,Math.floor(t/BE)), lt=t-i*BE;
+    F.fullText=beats[i];
+    F.fullA=Math.min(1,lt/BLD)*Math.min(1,(BE-lt)/BLD);
+    if(t>=9.2&&t<9.7) F.flash=1-(t-9.2)/0.5;
+    F.t0=T_MIN; F.markP=0; F.rekP=0; F.flutP=0;
+  } else if(t<23.6){
+    /* Die Welt (5,2 s): der Kurs zeichnet sich, dann die Wasserlinie mit
+       Lichtpunkt an der Spitze. Ein Etikett: die Wochen unter Wasser. */
+    const p=(t-18.4)/5.2;
+    F.barsA=1-ease(Math.min(1,p*1.6)); F.chartA=1; F.priceP=ease(Math.min(1,p/0.45));
+    F.flutP=ease((p-0.40)/0.50);
+    F.markP=0; F.rekP=0; F.t0=T_MIN; F.grain=0.12;
+    F.callouts=[];
+    if(p>0.92) F.callouts.push(cCUR(Math.min(1,(p-0.92)*12)));
+  } else if(t<28.4){
+    /* Das Modell (4,8 s): die Tauchgaenge fuellen sich von links nach rechts,
+       der Kurs steht gedaempft; das Etikett bleibt. */
+    const p=(t-23.6)/4.8;
+    F.barsA=0; F.chartA=1; F.priceP=1; F.flutP=1; F.t0=T_MIN; F.grain=0.10;
+    F.rekP=ease(Math.min(1,p/0.7)); F.markP=0; F.aKurs=0.6;
+    F.lichtP=(p-0.15)/0.6;                                     /* Lichtlauf ueber die Wasserlinie */
+    F.callouts=[cCUR(1)];
+  } else if(t<34.6){
+    /* Die Kernszene (6,2 s): die Auftauch-Marken erscheinen, kurze zuerst,
+       lange zuletzt; an den langen steht ihre Tauchzeit. Alles bleibt stehen. */
+    const p=(t-28.4)/6.2;
+    F.barsA=0; F.chartA=1; F.priceP=1; F.flutP=1; F.grain=0.10; F.t0=T_MIN;
+    F.rekP=1; F.aKurs=0.6; F.aFlut=0.7; F.ohneEtikett=true;
+    F.markP=ease(Math.min(1,p/0.62));
+    F.callouts=[cCUR(1)];
+    lang.forEach((e,k)=>{ const s=0.40+k*0.09; if(p>s) F.callouts.push(cEV(e,'*'+num(e.len,0)+' wk*',Math.min(1,(p-s)*9),OR,(k%2?1:-1)*fA*2.0)); });
+  } else {
+    /* Das Urteil (5,4 s): die grosse Zahl steht, darunter der Satz der Episode. */
+    const p=(t-34.6)/5.4;
+    F.barsA=ease(Math.min(1,p*2.2))*0.55; F.chartA=0.35; F.priceP=1; F.flutP=1;
+    F.markP=1; F.rekP=1; F.t0=T_MIN; F.fokusA=0; F.grain=0.14; F.ohneEtikett=true;
+    const h=lang.filter(e=>e.held).length;
+    F.bigText=num(h,0)+' OF '+num(lang.length,0);
+    F.bigSub='LOW NEVER SEEN AGAIN';
+    F.bigA=Math.min(1,p*4)*Math.min(1,(1-p)*8+0.4);
+  }
+  return F;
+}
+
+
+let RAF=null;
+function loop(){
+  RAF=requestAnimationFrame(loop);
+  if(CIN.start){
+    const ms=performance.now()-CIN.start;
+    if(ms>=CIN.dauer){ stopCin(); return; }
+    const F=frameFor(ms);
+    const altT=S.t0, altS=S.stufe, altD=S.minDive;
+    if(F.t0)S.t0=F.t0; if(F.stufe)S.stufe=F.stufe; if(F.minDive){ if(S.minDive!==F.minDive){S.minDive=F.minDive; rechnen();} }
+    render(performance.now(),F);
+    S.t0=altT; S.stufe=altS; if(S.minDive!==altD){ S.minDive=altD; rechnen(); }
+  } else if(HL.start){
+    const ms=performance.now()-HL.start;
+    /* nach dem Aufbau bleibt das Bild stehen, bis irgendeine Taste gedrueckt wird (19.09.2026) */
+    const F=hlFrame(ms);
+    const altT=S.t0, altS=S.stufe, altD=S.minDive;
+    if(F.t0)S.t0=F.t0; if(F.stufe)S.stufe=F.stufe; if(F.minDive){ if(S.minDive!==F.minDive){S.minDive=F.minDive; rechnen();} }
+    render(performance.now(),F);
+    S.t0=altT; S.stufe=altS; if(S.minDive!==altD){ S.minDive=altD; rechnen(); }
+  } else {
+    render(performance.now(),{});
+  }
+}
+function sichern(){ CIN.sichern={t0:S.t0,minDive:S.minDive,stufe:S.stufe,marken:S.marken,texte:S.texte}; }
+function zurueck(){ if(CIN.sichern){ S.t0=CIN.sichern.t0; S.minDive=CIN.sichern.minDive; S.stufe=CIN.sichern.stufe;
+  S.marken=CIN.sichern.marken; S.texte=CIN.sichern.texte; CIN.sichern=null; rechnen(); syncUI(); } }
+function startCin(){ if(HL.start) stopHL(); sichern(); S.marken=true; S.texte=false; S.minDive=13; S.stufe=1; rechnen();
+  const p=document.getElementById('pan'); CIN.panAlt=p.style.display; p.style.display='none';
+  CIN.start=performance.now(); }
+function stopCin(){ CIN.start=0;
+  const p=document.getElementById('pan'); p.style.display=CIN.panAlt||'';
+  zurueck(); }
+
+
+/* ===================== Bedienung ===================== */
+function syncUI(){
+  const fz=(S.t0-T_MIN)/(T_MAXZ-T_MIN);
+  document.getElementById('rZ').value=Math.round(Math.max(0,Math.min(1,fz))*1000);
+  document.getElementById('lZ').textContent='FROM '+dstr(S.t0);
+  document.getElementById('rG').value=S.minDive;
+  document.getElementById('lG').textContent=num(S.minDive,0)+(S.minDive===1?' week':' weeks')+' · '+num(ST.nSel,0)+' of '+num(ST.n,0)+' count';
+  document.querySelectorAll('.stufe').forEach(b=>b.classList.toggle('on',+b.dataset.s===S.stufe));
+  document.getElementById('swM').classList.toggle('on',S.marken);
+  document.getElementById('swT').classList.toggle('on',S.texte);
+
+  document.getElementById('k1').textContent=num(ST.wUW,0);
+  document.getElementById('k2').textContent='$'+num(ST.low,0);
+  document.getElementById('k3').textContent='$'+num(ST.noetig,0);
+  document.getElementById('k4').textContent=pct(ST.upNow*100,1);
+  const lang=EV.filter(e=>e.len>=13), kurz=EV.filter(e=>e.len<13);
+  document.getElementById('qz').innerHTML=
+    'Price: Coin Metrics Community <b>PriceUSD</b>, Sunday closes 18 Jul 2010 – '+dstr(tsOfI(NP-1))+' ('+num(NP,0)+' weeks); '+
+    'the last point is the daily value of <b>'+dEN(D.stand)+'</b>, $'+num(D.kurs,2)+' — the reference for every “today” figure. '+
+    'Bitstamp differs by 0.03–0.07% on the same days.<br>'+
+    '<b>The line</b> is the plain average of the last 50 Sunday closes (no weighting, no fit). Under water = a Sunday close below it; '+
+    'a dive ends with the first close back above it. The line for the running week uses the last 49 Sundays plus the '+dEN(D.stand)+' price; '+
+    'it ends above the line if Sunday closes at or above <b>$'+num(ST.noetig,0)+'</b>.<br>'+
+    '<b>Counted from raw data:</b> '+num(ST.n,0)+' surfacings since 2012. Low of the dive seen again later: '+num(ST.n-ST.heldAll,0)+' of '+num(ST.n,0)+'; '+
+    'back under the line within 26 weeks: '+num(ST.sankAll,0)+' of '+num(ST.n,0)+' — for comparison, any random week above the line is back under within 26 weeks in '+
+    num(ST.ctrlBack/ST.ctrlN*100,0)+'% of cases ('+num(ST.ctrlBack,0)+' of '+num(ST.ctrlN,0)+'). '+
+    'Dives of 13 weeks or more: '+num(lang.length,0)+', low never seen again '+num(lang.filter(e=>e.held).length,0)+' of '+num(lang.length,0)+', '+
+    'surfaced '+pct(ST.longMinUp*100,0)+' to '+pct(ST.longMaxUp*100,0)+' above their low. Dives under 13 weeks: '+num(kurz.length,0)+', low broken again '+num(kurz.filter(e=>!e.held).length,0)+' of '+num(kurz.length,0)+'. '+
+    'The 12-week dive of March 2022 is the nearest counter-example: one week short of the threshold, low broken 6 weeks later.<br>'+
+    'Same picture with a 30-, 40- or 100-week line (see paper). MIN DIVE moves the threshold; TIME RANGE moves the left edge.';
+}
+document.getElementById('panT').onclick=e=>{
+  const p=document.getElementById('pan'); p.classList.toggle('zu');
+  e.target.innerHTML=p.classList.contains('zu')?'&#9654;':'&#9664;';
+};
+document.getElementById('rZ').oninput=e=>{ const f=e.target.value/1000; S.t0=T_MIN+f*(T_MAXZ-T_MIN); syncUI(); };
+document.getElementById('rG').oninput=e=>{ S.minDive=+e.target.value; rechnen(); syncUI(); };
+document.querySelectorAll('.stufe').forEach(b=>b.onclick=()=>{ S.stufe=+b.dataset.s; syncUI(); });
+document.getElementById('swM').onclick=()=>{ S.marken=!S.marken; syncUI(); };
+document.getElementById('swT').onclick=()=>{ S.texte=!S.texte; syncUI(); };
+(function(){ const p=document.getElementById('pan'),h=document.getElementById('panH');
+  let dx=0,dy=0,on=false;
+  h.addEventListener('mousedown',e=>{ if(e.target.id==='panT')return; on=true;
+    dx=e.clientX-p.offsetLeft; dy=e.clientY-p.offsetTop; e.preventDefault(); });
+  window.addEventListener('mousemove',e=>{ if(!on)return; p.style.left=(e.clientX-dx)+'px'; p.style.top=(e.clientY-dy)+'px'; });
+  window.addEventListener('mouseup',()=>on=false); })();
+
+let sZeit=0;
+window.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if(HL.start){ stopHL(); if(k!=='s'){ sZeit=0; return; } }   /* jede Taste beendet ein stehendes Highlight; 's' leitet gleich das naechste ein */
+  if(k==='escape'){ if(CIN.start)stopCin(); sZeit=0; return; }
+  if(k==='s'){ sZeit=performance.now(); return; }
+  if(k==='t'){ if(sZeit&&performance.now()-sZeit<1200&&!CIN.start){ startCin(); } sZeit=0; return; }
+  if(k>='1'&&k<='9'){ if(sZeit&&performance.now()-sZeit<1200){ startHL(+k); } sZeit=0; return; }
+  sZeit=0;
+});
+
+/* Tooltip - Geistermarke am Kursverlauf: Datum, Kurs, Wasserlinie, Woche
+   des Tauchgangs, und am Auftauchen sein ganzer Steckbrief. */
+const tt=document.getElementById('tt');
+cv.addEventListener('mousemove',e=>{
+  if(CIN.start||HL.start){tt.style.display='none';return;}
+  const g=geo(); const ts=tsOf(e.clientX,g);
+  if(ts<S.t0||ts>D.standTs+3*DAY){tt.style.display='none';return;}
+  const i=Math.max(0,Math.min(NA-1,iOf(ts)));
+  let z='';
+  if(isFinite(MA[i])){
+    z+='<div style="color:'+EC+'">50-week average $'+num(MA[i],MA[i]<10?2:0)+' · price '+pct((PX[i]/MA[i]-1)*100,1)+'</div>';
+    let dv=DIVES.find(d=>i>=d.i0&&i<d.i1) || (CUR&&i>=CUR.i0?CUR:null);
+    const ev=EV.find(x=>x.i===i);
+    if(ev){ z+='<div style="color:'+(ev.held?OR:'#fff')+'"><b>Surfaced</b> after '+num(ev.len,0)+' wk · low $'+num(ev.low,ev.low<10?2:0)+' on '+dstr(tsOfI(ev.iMin))+' ('+pct(ev.up*100,0)+')</div>';
+      z+='<div style="color:'+(ev.held?OR:'#fff')+'">'+(ev.held?'low never seen again':'low broken '+num(ev.broke,0)+' wk later')+' · '+(ev.back===null?'stayed above the line 26 wk':'back under after '+num(ev.back,0)+' wk')+'</div>'; }
+    else if(dv){ z+='<div style="color:'+GR+'">under water · week '+num(i-dv.i0+1,0)+(dv===CUR?' of the current dive':' of '+num(dv.len,0))+'</div>'; }
+    else if(i>=D.N-1){ z+='<div style="color:'+GR+'">above the line</div>'; }
+  } else z+='<div style="color:'+GR+'">no line yet (fewer than 50 weeks)</div>';
+  tt.innerHTML='<div class="d">'+dstr2(tsOfI(i))+(i===NP?' (latest)':'')+'</div>'+
+    '<div><b style="color:#fff">$'+num(PX[i],PX[i]<10?4:0)+'</b></div>'+z;
+  tt.style.display='block';
+  tt.style.left=Math.min(window.innerWidth-tt.offsetWidth-12,e.clientX+16)+'px';
+  tt.style.top=Math.min(window.innerHeight-tt.offsetHeight-12,e.clientY+16)+'px';
+});
+cv.addEventListener('mouseleave',()=>tt.style.display='none');
+window.addEventListener('blur',()=>tt.style.display='none');
+
+/* Teilen */
+const HREFS=[];
+(function(){
+  function titel(){
+    const lang=EV.filter(e=>e.len>=13), h=lang.filter(e=>e.held).length;
+    return 'Bitcoin and the 50-week line: '+num(ST.n,0)+' times it came back above since 2012, '+num(ST.sankAll,0)+' of them sank again within 6 months. '
+      +'But after a long dive (13+ weeks under) the low was never seen again: '+num(h,0)+' of '+num(lang.length,0)+'. '
+      +'Today: '+num(ST.wUW,0)+' weeks under water, low $'+num(ST.low,0)+'; Sunday close needed to surface: $'+num(ST.noetig,0)+'. '
+      +'Computed from '+num(NP,0)+' weekly closes since 2010.';
+  }
+  function ziel(){ const h=location.href; return (h.length>2000||h.indexOf('data:')===0)?'':h; }
+  function fallback(txt){ try{ const r=navigator.clipboard.writeText(txt);
+    if(r&&r.catch) r.catch(()=>{}); }catch(_){ } }
+  function bind(sel,mk){
+    const a=document.querySelector(sel);
+    a.addEventListener('click',ev=>{ ev.preventDefault();
+      const u=ziel(), url=mk(u);
+      const sp=a.querySelector('span'), alt=sp.textContent;
+      if(!url){ fallback(titel()+(u?' '+u:'')); sp.textContent='Text copied ✓'; setTimeout(()=>sp.textContent=alt,1800); return; }
+      const w=window.open(url,'_blank','noopener,noreferrer');
+      if(!w){ fallback(titel()+(u?' '+u:'')); sp.textContent='Text copied ✓'; setTimeout(()=>sp.textContent=alt,1800); }
+    });
+    HREFS.push(()=>a.setAttribute('href',mk(ziel())||'#'));
+  }
+  bind('#srl a.wa',u=>'https://wa.me/?text='+encodeURIComponent(titel()+(u?' '+u:'')));
+  bind('#srl a.xx',u=>'https://x.com/intent/post?text='+encodeURIComponent(titel())+(u?'&url='+encodeURIComponent(u):''));
+  bind('#srl a.yt',()=> 'https://www.youtube.com/@WalletGreat');
+  const lk=document.querySelector('#srl a.lk');
+  lk.addEventListener('click',ev=>{ ev.preventDefault(); const u=ziel();
+    fallback(u||titel()); const sp=lk.querySelector('span'), alt=sp.textContent;
+    sp.textContent='Copied ✓'; setTimeout(()=>sp.textContent=alt,1800); });
+})();
+
+/* Start */
+rechnen(); syncUI(); HREFS.forEach(f=>f()); loop();
+window.addEventListener('resize',()=>{});
+</script>
+</body>
+</html>
